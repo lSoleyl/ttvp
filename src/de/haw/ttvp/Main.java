@@ -2,6 +2,7 @@ package de.haw.ttvp;
 
 import de.haw.ttvp.chord.RemoteChordNetworkAccess;
 import de.uniba.wiai.lspi.chord.data.URL;
+import de.uniba.wiai.lspi.chord.service.Chord;
 import de.uniba.wiai.lspi.chord.service.PropertiesLoader;
 import org.apache.log4j.Logger;
 
@@ -27,8 +28,14 @@ public class Main {
 		
 		// Loading Chord.properties File
 		PropertiesLoader.loadPropertyFile();
-    RemoteChordNetworkAccess chord = RemoteChordNetworkAccess.getUniqueInstance();
-    chord.join(connectURL, ListenPort);
+    RemoteChordNetworkAccess network = RemoteChordNetworkAccess.getUniqueInstance();
+    network.join(connectURL, ListenPort);
+    
+    Chord chord = network.getChordInstance();
+    
+    //TODO insert a somehow valid TargetID (from fingertable?)
+    chord.broadcast(null, Boolean.TRUE); //Implement broadcast in de.uniba.wiai.lspi.chord.service.impl.ChordImpl#1117
+    //And here: de.uniba.wiai.lspi.chord.service.impl.NodeImpl#431
 
 	}
 

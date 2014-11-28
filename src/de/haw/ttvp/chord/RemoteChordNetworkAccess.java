@@ -94,7 +94,7 @@ public final class RemoteChordNetworkAccess {
 	 * 
 	 * @throws Exception
 	 */
-	void leave() throws Exception {
+	public void leave() throws Exception {
 		if (this.chordInstance == null) {
 			/*
 			 * Nothing to do here.
@@ -109,7 +109,7 @@ public final class RemoteChordNetworkAccess {
 	/**
 	 * @return Returns the chordInstance.
 	 */
-	Chord getChordInstance() {
+	public Chord getChordInstance() {
 		return this.chordInstance;
 	}
 }
