@@ -1,35 +1,34 @@
 package de.haw.ttvp;
 
-import java.net.MalformedURLException;
-
-import de.haw.ttvp.chord.NodeImpl;
-import de.uniba.wiai.lspi.chord.com.Endpoint;
+import de.haw.ttvp.chord.RemoteChordNetworkAccess;
+import de.uniba.wiai.lspi.chord.data.URL;
 import de.uniba.wiai.lspi.chord.service.PropertiesLoader;
-
 import org.apache.log4j.Logger;
 
 public class Main {
 	private static final Logger LOG = Logger.getLogger(Main.class);
 	
-	static final String URL1 = "ocsocket://localhost:4245/";
+	static final String URLPrefix = "ocsocket://";
+  static final int ListenPort = 4245;
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		LOG.info("Starting Test-Application ...");
+    String ip = (args.length >= 1) ? args[1] : null;
+    String port = (args.length >= 2) ? args[2] : ""+ListenPort;
+    URL connectURL = null;
+    
+    if (ip != null) {
+      connectURL = new URL(URLPrefix + ip + ":" + port + "/");
+      LOG.info("Joining chord network at "+ connectURL.toString());
+    } else {
+      LOG.info("Starting new chord Network.");
+    }
+      
 		
 		// Loading Chord.properties File
 		PropertiesLoader.loadPropertyFile();
-		
-		try {
-			NodeImpl node = new NodeImpl(URL1);
-			Endpoint ep = Endpoint.createEndpoint(node, node.getURL());
-			ep.listen();
-			ep.acceptEntries();
-		} catch(MalformedURLException e){
-			LOG.error("ERROR: MalformedURLException: "+e.getLocalizedMessage(), e);
-			
-			// TODO do something
-		}
-		
+    RemoteChordNetworkAccess chord = RemoteChordNetworkAccess.getUniqueInstance();
+    chord.join(connectURL, ListenPort);
 
 	}
 
