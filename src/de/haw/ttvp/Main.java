@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 public class Main {
 	private static final Logger LOG = Logger.getLogger(Main.class);
 	
-	static final String URL1 = "ocsoket://localhost:4245/";
+	static final String URL1 = "ocsocket://localhost:4245/";
 	
 	public static void main(String[] args) {
 		LOG.info("Starting Test-Application ...");
