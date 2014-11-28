@@ -17,7 +17,7 @@ import de.uniba.wiai.lspi.chord.data.URL;
 public class NodeImpl extends Node {
 	private static final Logger LOG = Logger.getLogger(NodeImpl.class);
 	
-	NodeImpl(String url) throws MalformedURLException {
+	public NodeImpl(String url) throws MalformedURLException {
 		this.nodeURL = new URL(url);
 		this.nodeID = new ID(this.nodeURL.toString().getBytes());
 	}
@@ -120,6 +120,22 @@ public class NodeImpl extends Node {
 		
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public URL getURL(){
+		return this.nodeURL;
+	}
+	
+	public ID getID(){
+		return this.nodeID;
+	}
+	
+	public void setURL(URL nodeURL){
+		this.nodeURL = nodeURL;
+	}
+	
+	public void setID(ID nodeID){
+		this.nodeID = nodeID;
 	}
 
 }

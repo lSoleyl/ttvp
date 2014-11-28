@@ -1,5 +1,7 @@
 package de.haw.ttvp;
 
+import java.net.MalformedURLException;
+
 import de.haw.ttvp.chord.NodeImpl;
 import de.uniba.wiai.lspi.chord.com.Endpoint;
 import de.uniba.wiai.lspi.chord.service.PropertiesLoader;
@@ -17,10 +19,17 @@ public class Main {
 		// Loading Chord.properties File
 		PropertiesLoader.loadPropertyFile();
 		
-		NodeImpl node = new NodeImpl(URL1);
-		Endpoint ep = Endpoint.createEndpoint(node, node.nodeURL);
-		ep.listen();
-		ep.acceptEntries();
+		try {
+			NodeImpl node = new NodeImpl(URL1);
+			Endpoint ep = Endpoint.createEndpoint(node, node.getURL());
+			ep.listen();
+			ep.acceptEntries();
+		} catch(MalformedURLException e){
+			LOG.error("ERROR: MalformedURLException: "+e.getLocalizedMessage(), e);
+			
+			// TODO do something
+		}
+		
 
 	}
 
