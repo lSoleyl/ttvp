@@ -13,8 +13,8 @@ public class Main {
 	
 	public static void main(String[] args) throws Exception {
 		LOG.info("Starting Test-Application ...");
-    String ip = (args.length >= 1) ? args[1] : null;
-    String port = (args.length >= 2) ? args[2] : ""+ListenPort;
+    String ip = (args.length >= 1) ? args[0] : null;
+    String port = (args.length >= 2) ? args[1] : ""+ListenPort;
     URL connectURL = null;
     
     if (ip != null) {
