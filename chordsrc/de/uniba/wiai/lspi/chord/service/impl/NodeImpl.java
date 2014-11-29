@@ -27,6 +27,7 @@
  ***************************************************************************/
 package de.uniba.wiai.lspi.chord.service.impl;
 
+import de.haw.ttvp.Transaction;
 import static de.uniba.wiai.lspi.util.logging.Logger.LogLevel.DEBUG;
 import static de.uniba.wiai.lspi.util.logging.Logger.LogLevel.INFO;
 
@@ -48,6 +49,7 @@ import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.data.URL;
 import de.uniba.wiai.lspi.chord.service.NotifyCallback;
 import de.uniba.wiai.lspi.util.logging.Logger;
+import java.math.BigInteger;
 
 /**
  * Implements all operations which can be invoked remotely by other nodes.
@@ -426,14 +428,41 @@ public final class NodeImpl extends Node {
 		return this.asyncExecutor;
 	}
 	
-	// TODO: implement this function in TTP
 	@Override
 	public final void broadcast(Broadcast info) throws CommunicationException {
 		if (this.logger.isEnabledFor(DEBUG)) {
 			this.logger.debug(" Send broadcast message");
 		}
+    
+    //Prüfen, ob die ID eine aufsteigende ist
+    if (!Transaction.validID(info.getTransaction())) {
+      logger.warn("Dropping broadcast message due to wrong transaction ID");
+      return;
+    } else
+      Transaction.updateID(info.getTransaction());
+    
+    ID range = info.getRange();
+    Node[] fingerTable = this.references.getFingerTableCopy();
+      
+    //An alle Knoten der Finger-Table weitersenden, die sich im Intervall [this.id; range] befinden
+    for(int c = 0; c < fingerTable.length && fingerTable[c].getNodeID().isInInterval(nodeID, range); ++c) {
+      Node receiver = fingerTable[c];
+      
+      ID subRange = range;
+      if (fingerTable.length < c+1) {
+        ID successorID = fingerTable[c+1].getNodeID();
+        //Prüfen, ob der nächste Eintrag der Finger-Table zwischen dem aktuellen Eintrag und Range liegt.
+        //Wenn ja, dann die Range entsprechend einschräbnken, die an den aktuellen Knoten gesendet wird. (So, dass der nächste Knoten den Broadcast nicht mehr erhält)
+        if (successorID.isInInterval(nodeID, range))
+          range = successorID.add(-1); //-1, um den nachfolgenden Eintrag auszuschließen
+      }
+      
+      //Neue BroadcastInfo bauen und Broadcast an Knoten weiterleiten
+      Broadcast bInfo = new Broadcast(range, info.getSource(), info.getTarget(), info.getTransaction(), info.getHit());      
+      receiver.broadcast(bInfo);
+    }
 		
-		// finally inform application
+		//Broadcast an Anwendung weiterreichen
 		if (this.notifyCallback != null) {
 			this.notifyCallback.broadcast(info.getSource(), info.getTarget(), info.getHit());
 		}

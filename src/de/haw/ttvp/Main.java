@@ -33,10 +33,9 @@ public class Main {
     
     Chord chord = network.getChordInstance();
     
-    //TODO insert a somehow valid TargetID (from fingertable?)
-    chord.broadcast(null, Boolean.TRUE); //Implement broadcast in de.uniba.wiai.lspi.chord.service.impl.ChordImpl#1117
-    //And here: de.uniba.wiai.lspi.chord.service.impl.NodeImpl#431
-
+    //TODO this will be send whenever someone retrieves a key from our keyspace
+    //     the targetID will then be the retrieved keyID
+    chord.broadcast(null, Boolean.TRUE);
 	}
 
 }

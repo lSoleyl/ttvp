@@ -27,6 +27,7 @@
  ***************************************************************************/
 package de.uniba.wiai.lspi.chord.service.impl;
 
+import de.haw.ttvp.Transaction;
 import static de.uniba.wiai.lspi.util.logging.Logger.LogLevel.DEBUG;
 import static de.uniba.wiai.lspi.util.logging.Logger.LogLevel.INFO;
 
@@ -59,6 +60,7 @@ import de.uniba.wiai.lspi.chord.service.NotifyCallback;
 import de.uniba.wiai.lspi.chord.service.Report;
 import de.uniba.wiai.lspi.chord.service.ServiceException;
 import de.uniba.wiai.lspi.util.logging.Logger;
+import java.util.logging.Level;
 
 /**
  * Implements all operations which can be invoked on the local node.
@@ -1111,12 +1113,22 @@ public final class ChordImpl implements Chord, Report, AsynChord {
 		return ChordRemoveFuture.create(this.asyncExecutor, this, key, entry);
 	}
 	
-	// TODO: implement this function in TTP 
-	//send broadcast to all nodes in finger table
+	/** Send a broadcast to all nodes in finger table
+   *  This method actually only calculates the parameters for the Broadcast-Object and then
+   *  delegates the actual broadcast to the NodeImpl.
+   */
 	@Override
 	public void broadcast (ID target, Boolean hit) {
-		this.logger.debug("App called broadcast");
-		
+		//Range berechnen (= NodeID-1 damit die Message einmal um den gesamten Ring geht und den Knoten selbst nicht mehr erreicht)
+    ID range = localNode.getNodeID().add(-1);
+    
+    Broadcast info = new Broadcast(range, this.localNode.getNodeID(), target, Transaction.nextID(), hit);
+    
+    try {    		
+      this.localNode.broadcast(info);
+    } catch (CommunicationException ex) {
+      logger.error("Failed to send a broadcast message.", ex);
+    }
 	}
 	
 	public void setCallback (NotifyCallback callback) {
