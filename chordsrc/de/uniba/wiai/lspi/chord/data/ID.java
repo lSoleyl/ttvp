@@ -117,6 +117,22 @@ public final class ID implements Comparable<ID>, Serializable {
 		System.arraycopy(id1, 0, this.id, 0, id1.length);
 	}
 
+  /** A generic method to create a new ID by adding a number to the id.
+   *  The result is a new ID which is guaranteed to be inside the ID ring
+   * 
+   * @param value the value to add (may be negative)
+   *  
+   * @result a new ID = ((ID + value)%idsize)
+   */
+  public ID add(int value) {
+    BigInteger idValue = toBigInteger().add(BigInteger.valueOf(value));
+    //Modulo Ringgröße
+    BigInteger base = BigInteger.valueOf(2).pow(id.length);
+    idValue = idValue.mod(base);
+    return new ID(idValue.toByteArray());    
+  }
+  
+  
 	/**
 	 * Creates an ID instance by copying the byte array from the given value to
 	 * the new ID. Since BigInteger stores the byte array as a two's-complement
