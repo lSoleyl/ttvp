@@ -124,12 +124,28 @@ public final class ID implements Comparable<ID>, Serializable {
    *  
    * @result a new ID = ((ID + value)%idsize)
    */
-  public ID add(int value) {
-    BigInteger idValue = toBigInteger().add(BigInteger.valueOf(value));
+  public ID add(BigInteger value) {
+    BigInteger idValue = toBigInteger().add(value);
     //Modulo Ringgröße
     BigInteger base = BigInteger.valueOf(2).pow(id.length);
     idValue = idValue.mod(base);
-    return new ID(idValue.toByteArray());    
+    return ID.valueOf(idValue);
+  }
+
+  public ID add(int value) {
+    return add(BigInteger.valueOf(value));
+  }
+  
+  /** Calculates the distance between this ID and the given other ID.
+   *  Essentially executes (other-this)
+   * 
+   * @param other the ID to get the distance to
+   * 
+   * @return the distance from this to ID as BigInteger
+   */
+  public BigInteger distanceTo(ID other) {
+    BigInteger nself = toBigInteger().negate();
+    return other.add(nself).toBigInteger();
   }
   
   

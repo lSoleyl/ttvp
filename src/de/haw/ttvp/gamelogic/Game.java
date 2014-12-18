@@ -54,12 +54,13 @@ public class Game {
       err("Can't start game! Client is the only member of this chord network");
     } else {
       log.info("Calculating distribution interval");
-      //TODO (localID-predID) in INTERVALS teilintervalle aufteilen
-      //Darin SHIPS Shiffe verteilen
+      IDInterval interval = new IDInterval(predID, localID, INTERVALS);
+      //TODO schiffe auf das Intervall aufteilen
+      //chord.insert(ID, ???)
       
       log.info("Distributing ships");
       //TODO müssen die Schiffe an jede ID innerhalb des Intervals gelegt werden, oder nur an die erste?
-      //TODO und wenn nur an eine Stelle, wie verhindert man Off-By-One Fehler?
+      //TODO und wenn nur an eine Stelle, wie verhindert man Off-By-One Fehler? (Offene/Geschlossene geschlossene Intervalle)
     }
   }
  
