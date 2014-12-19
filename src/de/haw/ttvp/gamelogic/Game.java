@@ -2,6 +2,7 @@ package de.haw.ttvp.gamelogic;
 
 import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.service.Chord;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -42,9 +43,19 @@ public class Game {
       //TODO Prüfen, ob man der erste Spieler ist
       
       setReady();
+      
+      if (isBeginningPlayer(idRange)) {
+        log.info("I am staring the Game");
+        //TODO ersten Schuss abgegben
+      }
     } catch (GameError e) {
       log.error("Game aborted!\n", e);
     }
+  }
+  
+  private boolean isBeginningPlayer(IDInterval range) {
+    BigInteger maxID = BigInteger.valueOf(2).pow(160).subtract(BigInteger.ONE);
+    return range.getIntervalID(ID.valueOf(maxID)) != null;      
   }
   
   private IDInterval getNodeRange() throws GameError {
