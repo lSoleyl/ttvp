@@ -30,6 +30,12 @@ public class IDInterval {
     populateIds(intervals);
   }
   
+  public IDInterval(ID from, ID to) {
+    this.from = from;
+    this.to = to;
+    populateIds(Game.INTERVALS);
+  }
+  
   private void populateIds(int intervals) {
     BigInteger intervalSize = from.distanceTo(to);
     BigInteger stepSize = intervalSize.divide(BigInteger.valueOf(intervals));

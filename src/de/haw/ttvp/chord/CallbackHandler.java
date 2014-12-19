@@ -30,7 +30,7 @@ public class CallbackHandler implements NotifyCallback {
     Player dstPlayer = Game.instance.getPlayer(source);
     dstPlayer.setField(target, hit ? Field.SHIP : Field.NOTHING);
     
-    Game.instance.history.addEntry(transactionID, dstPlayer, target, hit);
+    Game.instance.history.addEntry(transactionID, source, target, hit);
   }
 
 }

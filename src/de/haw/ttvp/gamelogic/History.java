@@ -17,11 +17,11 @@ public class History {
 	
 	public class HistoryEntry {
 		public int transactionID;
-		public Player dstPlayer;
+		public ID dstPlayer; 
 		public ID targetID;
 		public boolean hit;
 		
-		public HistoryEntry(int transactionID, Player dstPlayer, ID targetID, boolean hit) {
+		public HistoryEntry(int transactionID, ID dstPlayer, ID targetID, boolean hit) {
 			this.transactionID = transactionID;
 			this.dstPlayer = dstPlayer;
 			this.targetID = targetID;
@@ -56,7 +56,7 @@ public class History {
 		
 	}
   
-  public void addEntry(int transactionID,	Player dstPlayer, ID targetID, boolean hit) {
+  public void addEntry(int transactionID,	ID dstPlayer, ID targetID, boolean hit) {
     addEntry(new HistoryEntry(transactionID, dstPlayer, targetID, hit));
   }
 	
