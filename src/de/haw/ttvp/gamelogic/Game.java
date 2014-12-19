@@ -1,19 +1,23 @@
 package de.haw.ttvp.gamelogic;
 
+import de.haw.ttvp.gamelogic.History.HistoryEntry;
 import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.service.Chord;
 import de.uniba.wiai.lspi.chord.service.impl.ChordImpl;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
 
+
+
 public class Game {
+  public static final boolean USE_NODE_CRAWLER = true;
   public static final int INTERVALS = 100;
   public static final int SHIPS = 10;
   public static Game instance = null;
@@ -22,14 +26,14 @@ public class Game {
   private boolean ready = false;
   private final Semaphore readyLock = new Semaphore(0);
   
-  public Map<ID, Player> playerMap = new HashMap<>();
+  public final Map<ID, Player> playerMap = new ConcurrentHashMap<>(); //Wird von dem Crawler-Thread mitbeschrieben
   public Player self;
   public History history;
   
   private final Chord chord;
-  //TODO müssen die Schiffe in einer Map gespeichert werden, oder sind die so in Chord gespeichert?
-  //TODO wie speichern wir, welcher Knoten noch wie viele Schiffe besitzt und wo noch nicht geschossen wurde?
 
+  private boolean reapplyHistory = false; //Wird vom Crawler auf true gesetzt, wenn er fertig ist
+  
   public Game(Chord network) {
     this.chord = network;
     this.history = new History();
@@ -57,6 +61,19 @@ public class Game {
     return p;    
   }
   
+  /** Called by the node crawler during discovery.
+   */
+  public void addKnownPlayer(ID nodeID, IDInterval range) {
+    if (playerMap.containsKey(nodeID)) {
+      Player p = playerMap.get(nodeID);
+      if (p instanceof UnknownPlayer) { //Wenn es sich um einen UnknownPlayer handelt, dann kovertieren
+        playerMap.put(nodeID, ((UnknownPlayer)p).makeKnown(range));
+      }
+    } else { //Neuen Spieler anlegen.
+      playerMap.put(nodeID, new KnownPlayer(nodeID, range));
+    }
+  }
+  
   public void start() {
     if (JOptionPane.showConfirmDialog(null, "Start Game?", "User action", JOptionPane.YES_NO_OPTION) != 0) {
       log.warn("Game start aborted.");
@@ -64,15 +81,19 @@ public class Game {
     }
     
     try {
+      if (USE_NODE_CRAWLER)
+        new NodeCrawler(chord).start();
+      
       IDInterval idRange = getNodeRange();
       self = createSelfPlayer(idRange);
-      distributeShips(idRange);
-      //TODO Prüfen, ob man der erste Spieler ist
-      
+      distributeShips(idRange);      
       setReady();
       
       if (isBeginningPlayer(idRange)) {
-        log.info("I am staring the Game");
+        log.info("I am staring the Game in 3 seconds...");
+        try {
+          Thread.sleep(3000);
+        } catch (InterruptedException ex) {}
         //TODO ersten Schuss abgegben
       }
     } catch (GameError e) {
@@ -160,9 +181,31 @@ public class Game {
     ready = true;
     readyLock.release();
   }
+  
+  /** Is called inside the retrieve. This will fix all history issues(if any) caused
+   *  by concurrent access to the playerMap by the node crawler.
+   */
+  public void fixHistory() {
+    if (reapplyHistory) {
+      reapplyHistory = false;
+      
+      for(HistoryEntry entry : history.getEntries()) {
+        Player p = getPlayer(entry.dstPlayer);
+        p.setField(entry.targetID, entry.hit ? Field.SHIP : Field.NOTHING);
+      }
+    }
+  }
+  
+  /** This will be called by the node crawler to notify that the history should be checked.
+   */
+  public void reapplyHistory() {
+    reapplyHistory = true;
+  }
+  
+  public Chord getChord() {
+    return chord;
+  }
 }
-
-
 class GameError extends Exception {
   public GameError(String message) {
     super(message);

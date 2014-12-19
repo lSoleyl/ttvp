@@ -19,9 +19,20 @@ public class CallbackHandler implements NotifyCallback {
     LOG.debug("NotifyCallback.retrieved(" + target.toString() + ")");
     
     Game.instance.waitReady();
-    Player self = Game.instance.self;
-    //TODO prüfen, ob getroffen (self.hasShipAt(target))
+    Game.instance.fixHistory(); //History nachziehen, falls der Crawler fertig ist.
     
+    Player self = Game.instance.self;
+    
+    boolean hit = false;
+    if (self.hasShipAt(target)) {
+      self.setField(target, Field.NOTHING); //Shiff als versenkt markieren
+      hit = true;
+    }
+    
+    Game.instance.getChord().broadcast(target, hit); //Alle anderen Knoten benachrichtigen
+    
+    //TODO Strategie auswählen und zurückfeuern
+    //TODO vlt. 10-100 Millisekunden sleep? (Damit der Crawler Zeit hat Informationen zu sammeln und das Spiel nicht zu schnell vorbei ist)
   }
 
   @Override

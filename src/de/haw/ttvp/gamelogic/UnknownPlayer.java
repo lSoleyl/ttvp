@@ -6,6 +6,7 @@
 package de.haw.ttvp.gamelogic;
 
 import de.uniba.wiai.lspi.chord.data.ID;
+import java.util.Map.Entry;
 
 
 public class UnknownPlayer extends Player { 
@@ -27,9 +28,10 @@ public class UnknownPlayer extends Player {
   }
 
   /** Due to missing range information, the information is only entered into the field map
+   *  Synchronized, because it might conflict with makeKnown()
    */
   @Override
-  public void setField(ID target, Field type) {
+  public synchronized void setField(ID target, Field type) {
     fieldMap.put(target, type);
   }
 
@@ -38,5 +40,22 @@ public class UnknownPlayer extends Player {
     if (fieldMap.containsKey(target))
       return fieldMap.get(target);
     return Field.UNKNOWN;
+  }
+  
+  /** Converts the UnknownPlayer into a KnownPlayer by providing the range and reapplying the
+   *  fieldMap to the new player.
+   *  This method is synchronized due to possible conflicts with setField()
+   * 
+   * @param range the interval Range, which defines this node
+   * @return a new KnownPlayer
+   */
+  public synchronized Player makeKnown(IDInterval range) {
+    Player knownPlayer = new KnownPlayer(nodeID, range);
+    
+    //Bekannte Informationen auf neuen Spieler übertragen
+    for(Entry<ID, Field> info: fieldMap.entrySet())
+      knownPlayer.setField(info.getKey(), info.getValue());
+    
+    return knownPlayer;
   }
 }

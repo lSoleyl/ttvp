@@ -11,7 +11,7 @@ import java.util.Map;
 
 public abstract class Player {
   protected ID nodeID;
-  protected Map<ID, Field> fieldMap = new HashMap<>(); 
+  protected Map<ID, Field> fieldMap = new HashMap<>();
 
   public Player(ID nodeID) {
     this.nodeID = nodeID;
