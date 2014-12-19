@@ -2,6 +2,7 @@ package de.haw.ttvp.gamelogic;
 
 import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.service.Chord;
+import de.uniba.wiai.lspi.chord.service.impl.ChordImpl;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -116,7 +117,8 @@ public class Game {
   }
   
   private Player createSelfPlayer(IDInterval idrange) {
-    Player player = new KnownPlayer(idrange);
+    ChordImpl cImpl = (ChordImpl) chord;
+    Player player = new KnownPlayer(cImpl.getLocalNode().getNodeID(), idrange);
     
     for(ID id: idrange.ids) //Leeres Feld initialisieren
       player.setField(id, Field.NOTHING);
