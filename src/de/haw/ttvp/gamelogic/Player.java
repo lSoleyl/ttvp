@@ -6,8 +6,17 @@
 package de.haw.ttvp.gamelogic;
 
 import de.uniba.wiai.lspi.chord.data.ID;
+import java.util.HashMap;
+import java.util.Map;
 
-public interface Player {
+public abstract class Player {
+  protected ID nodeID;
+  protected Map<ID, Field> fieldMap = new HashMap<>(); 
+
+  public Player(ID nodeID) {
+    this.nodeID = nodeID;
+  }
+  
   /** Returns true if the player is known to have a ship at this position. 
    *  This is known either because the ship got hit or because the ships belong
    *  to yourself.
@@ -15,7 +24,7 @@ public interface Player {
    * @param target
    * @return 
    */
-  public boolean hasShipAt(ID target);
+  public abstract boolean hasShipAt(ID target);
   
   /** Set type of a field. If the given ID doesn't belong to this player
    *  nothing happens.
@@ -23,7 +32,7 @@ public interface Player {
    * @param target the field position
    * @param type the field type to set
    */
-  public void setField(ID target, Field type);
+  public abstract void setField(ID target, Field type);
   
   /** Returns the field type for a given ID.
    * 
@@ -33,5 +42,13 @@ public interface Player {
    *         If this ID doesn't belong to the player's interval
    *         the result is null!
    */
-  public Field getField(ID target);
+  public abstract Field getField(ID target);
+  
+  /** Return the Id of the player's node.
+   * 
+   * @return the player's id
+   */
+  public ID getID() {
+    return nodeID;
+  }
 }
