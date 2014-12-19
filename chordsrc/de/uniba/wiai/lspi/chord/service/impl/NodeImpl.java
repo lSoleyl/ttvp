@@ -437,7 +437,7 @@ public final class NodeImpl extends Node {
     
     //Prüfen, ob die ID eine aufsteigende ist
     if (Game.instance != null && Game.instance.history.isSimpleDuplicate(info.getTransaction())) {
-      log.warn("Dropping duplicate broadcast message with tid: " + info.getTransaction());
+      logger.warn("Dropping duplicate broadcast message with tid: " + info.getTransaction());
       return;
     }
     
@@ -464,7 +464,7 @@ public final class NodeImpl extends Node {
 		
 		//Broadcast an Anwendung weiterreichen
 		if (this.notifyCallback != null) {
-			this.notifyCallback.broadcast(info.getSource(), info.getTarget(), info.getHit());
+			this.notifyCallback.broadcast(info.getSource(), info.getTarget(), info.getHit(), info.getTransaction());
 		}
 	}
 
