@@ -4,6 +4,9 @@ import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.service.Chord;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
 
@@ -37,11 +40,7 @@ public class Game {
       //TODO wie wird das Ende des Spiels zuverlässig erkannt?
       //TODO wie muss das anderen Knoten mitgeteilt werden?
     } catch (GameError e) {
-      ByteArrayOutputStream ostream = new ByteArrayOutputStream();
-      PrintStream pstream = new PrintStream(ostream);
-      e.printStackTrace(pstream);
-      
-      log.error("Game aborted!\n" + ostream.toString());
+      log.error("Game aborted!\n", e);
     }
   }
 
@@ -56,12 +55,24 @@ public class Game {
       log.info("Calculating distribution interval");
       IDInterval interval = new IDInterval(predID, localID, INTERVALS);
       //TODO schiffe auf das Intervall aufteilen
-      //chord.insert(ID, ???)
+      
       
       log.info("Distributing ships");
-      //TODO müssen die Schiffe an jede ID innerhalb des Intervals gelegt werden, oder nur an die erste?
-      //TODO und wenn nur an eine Stelle, wie verhindert man Off-By-One Fehler? (Offene/Geschlossene geschlossene Intervalle)
+      
     }
+  }
+  
+  private List<Integer> selectShipPositions() {
+    List<Integer> slots = new ArrayList<>();
+    for(int i = 0; i < INTERVALS; ++i) //Liste mit Indizies befüllen
+      slots.add(i);
+    
+    Random rand = new Random();
+    
+    while (slots.size() > SHIPS)
+      slots.remove(rand.nextInt(slots.size()));
+    
+    return slots;
   }
  
   private void err(String msg) throws GameError {
