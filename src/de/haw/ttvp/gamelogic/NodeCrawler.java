@@ -60,11 +60,9 @@ public class NodeCrawler extends Thread {
   }
 
   private void checkNodes() {
-    synchronized(Game.instance.playerMap) {
-      for (Entry<ID,Player> entry: Game.instance.playerMap.entrySet()) {
-        if (entry.getValue() instanceof UnknownPlayer) {
-          log.error("Found unknown Player (after crawling!) @ Node:" + entry.getKey());
-        }
+    for (Entry<ID,Player> entry: Game.instance.playerMap.entrySet()) {
+      if (entry.getValue() instanceof UnknownPlayer) {
+        log.error("Found unknown Player (after crawling!) @ Node:" + entry.getKey());
       }
     }
   }
