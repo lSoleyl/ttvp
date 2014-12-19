@@ -28,6 +28,11 @@ public class History {
 		}
 		
 	}
+  
+  //Einfache Duplikatsprüfung für Broadcast
+  public boolean isSimpleDuplicate(int transactionID) {
+    return !entries.isEmpty() && entries.getLast().transactionID == transactionID;
+  }
 	
 	public void addEntry(HistoryEntry entry){
     if (entries.isEmpty() || Transaction.validIDFrom(entries.getLast().transactionID, entry.transactionID))

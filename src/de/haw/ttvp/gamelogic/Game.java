@@ -4,7 +4,9 @@ import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.service.Chord;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
 import javax.swing.JOptionPane;
@@ -19,7 +21,9 @@ public class Game {
   private boolean ready = false;
   private final Semaphore readyLock = new Semaphore(0);
   
+  public Map<ID, Player> playerMap = new HashMap<>();
   public Player self;
+  public History history;
   
   private final Chord chord;
   //TODO müssen die Schiffe in einer Map gespeichert werden, oder sind die so in Chord gespeichert?
@@ -27,6 +31,7 @@ public class Game {
 
   public Game(Chord network) {
     this.chord = network;
+    this.history = new History();
     Game.instance = this;
   }
   

@@ -42,6 +42,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import de.haw.ttvp.Transaction;
+import de.haw.ttvp.gamelogic.Game;
 import de.uniba.wiai.lspi.chord.com.Broadcast;
 import de.uniba.wiai.lspi.chord.com.CommunicationException;
 import de.uniba.wiai.lspi.chord.com.Entry;
@@ -1121,7 +1122,7 @@ public final class ChordImpl implements Chord, Report, AsynChord {
 		//Range berechnen (= NodeID-1 damit die Message einmal um den gesamten Ring geht und den Knoten selbst nicht mehr erreicht)
     ID range = localNode.getNodeID().add(-1);
     
-    Broadcast info = new Broadcast(range, this.localNode.getNodeID(), target, Transaction.nextID(), hit);
+    Broadcast info = new Broadcast(range, this.localNode.getNodeID(), target, Game.instance.history.getNextID(), hit);
     
     try {    		
       this.localNode.broadcast(info);

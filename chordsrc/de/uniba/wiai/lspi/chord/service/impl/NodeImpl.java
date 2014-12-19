@@ -28,6 +28,7 @@
 package de.uniba.wiai.lspi.chord.service.impl;
 
 import de.haw.ttvp.Transaction;
+import de.haw.ttvp.gamelogic.Game;
 import static de.uniba.wiai.lspi.util.logging.Logger.LogLevel.DEBUG;
 import static de.uniba.wiai.lspi.util.logging.Logger.LogLevel.INFO;
 
@@ -435,11 +436,10 @@ public final class NodeImpl extends Node {
 		}
     
     //Prüfen, ob die ID eine aufsteigende ist
-    if (!Transaction.validID(info.getTransaction())) {
-      logger.warn("Dropping broadcast message due to wrong transaction ID");
+    if (Game.instance != null && Game.instance.history.isSimpleDuplicate(info.getTransaction())) {
+      log.warn("Dropping duplicate broadcast message with tid: " + info.getTransaction());
       return;
-    } else
-      Transaction.updateID(info.getTransaction());
+    }
     
     ID range = info.getRange();
     Node[] fingerTable = this.references.getFingerTableCopy();
