@@ -50,6 +50,7 @@ import de.uniba.wiai.lspi.chord.data.URL;
 import de.uniba.wiai.lspi.chord.service.NotifyCallback;
 import de.uniba.wiai.lspi.util.logging.Logger;
 import java.math.BigInteger;
+import java.util.ArrayList;
 
 /**
  * Implements all operations which can be invoked remotely by other nodes.
@@ -442,8 +443,16 @@ public final class NodeImpl extends Node {
       Transaction.updateID(info.getTransaction());
     
     ID range = info.getRange();
-    Node[] fingerTable = this.references.getFingerTableCopy();
-      
+    Node[] rawFingerTable = this.references.getFingerTableCopy();
+    
+    //Finger-Tabelle filtern
+    List<Node> uniqueFingerTable = new ArrayList<>();
+    for(Node n: rawFingerTable)
+      if (uniqueFingerTable.get(uniqueFingerTable.size()-1) != n)
+        uniqueFingerTable.add(n);
+    
+    Node[] fingerTable = (Node[]) uniqueFingerTable.toArray();
+    
     //An alle Knoten der Finger-Table weitersenden, die sich im Intervall [this.id; range] befinden
     for(int c = 0; c < fingerTable.length && fingerTable[c].getNodeID().isInInterval(nodeID, range); ++c) {
       Node receiver = fingerTable[c];
