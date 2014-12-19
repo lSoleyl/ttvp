@@ -35,6 +35,27 @@ public class Game {
     Game.instance = this;
   }
   
+  /** Returns a player object for the given node id.
+   *  If the player isn't already known, then a new unknown player is created
+   *  and inserted into the player map.
+   * 
+   * @param nodeID the ID of the player's node
+   * 
+   * @return a player object.
+   */
+  public Player getPlayer(ID nodeID) {
+    if (self.getID().equals(nodeID))
+      return self;
+    
+    if (playerMap.containsKey(nodeID))
+      return playerMap.get(nodeID);
+    
+    //Neuer Spieler entdeckt
+    Player p = new UnknownPlayer(nodeID);
+    playerMap.put(nodeID, p);
+    return p;    
+  }
+  
   public void start() {
     if (JOptionPane.showConfirmDialog(null, "Start Game?", "User action", JOptionPane.YES_NO_OPTION) != 0) {
       log.warn("Game start aborted.");
