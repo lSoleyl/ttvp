@@ -1,5 +1,7 @@
 package de.haw.ttvp.chord;
 
+import de.haw.ttvp.gamelogic.Game;
+import de.haw.ttvp.gamelogic.Player;
 import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.service.NotifyCallback;
 import org.apache.log4j.Logger;
@@ -14,6 +16,11 @@ public class CallbackHandler implements NotifyCallback {
   @Override
   public void retrieved(ID target) {
     LOG.debug("NotifyCallback.retrieved(" + target.toString() + ")");
+    
+    Game.instance.waitReady();
+    Player self = Game.instance.self;
+    //TODO prüfen, ob getroffen (self.hasShipAt(target))
+    
   }
 
   @Override
