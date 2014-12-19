@@ -16,16 +16,12 @@ public class History {
 	
 	public class HistoryEntry {
 		public int transactionID;
-		public Player srcPlayer;
 		public Player dstPlayer;
 		public int slot;
 		public boolean hit;
 		
-		public HistoryEntry(int transactionID, Player srcPlayer,
-				Player dstPlayer, int slot, boolean hit) {
-			super();
+		public HistoryEntry(int transactionID, Player dstPlayer, int slot, boolean hit) {
 			this.transactionID = transactionID;
-			this.srcPlayer = srcPlayer;
 			this.dstPlayer = dstPlayer;
 			this.slot = slot;
 			this.hit = hit;
@@ -54,8 +50,8 @@ public class History {
 		
 	}
   
-  public void addEntry(int transactionID, Player srcPlayer,	Player dstPlayer, int slot, boolean hit) {
-    addEntry(new HistoryEntry(transactionID, srcPlayer, dstPlayer, slot, hit));
+  public void addEntry(int transactionID,	Player dstPlayer, int slot, boolean hit) {
+    addEntry(new HistoryEntry(transactionID, dstPlayer, slot, hit));
   }
 	
 	public List<HistoryEntry> getEntries(){
