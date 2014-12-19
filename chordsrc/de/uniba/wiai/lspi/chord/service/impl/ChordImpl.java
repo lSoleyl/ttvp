@@ -27,7 +27,6 @@
  ***************************************************************************/
 package de.uniba.wiai.lspi.chord.service.impl;
 
-import de.haw.ttvp.Transaction;
 import static de.uniba.wiai.lspi.util.logging.Logger.LogLevel.DEBUG;
 import static de.uniba.wiai.lspi.util.logging.Logger.LogLevel.INFO;
 
@@ -42,6 +41,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import de.haw.ttvp.Transaction;
 import de.uniba.wiai.lspi.chord.com.Broadcast;
 import de.uniba.wiai.lspi.chord.com.CommunicationException;
 import de.uniba.wiai.lspi.chord.com.Entry;
@@ -60,7 +60,6 @@ import de.uniba.wiai.lspi.chord.service.NotifyCallback;
 import de.uniba.wiai.lspi.chord.service.Report;
 import de.uniba.wiai.lspi.chord.service.ServiceException;
 import de.uniba.wiai.lspi.util.logging.Logger;
-import java.util.logging.Level;
 
 /**
  * Implements all operations which can be invoked on the local node.
@@ -1156,6 +1155,10 @@ public final class ChordImpl implements Chord, Report, AsynChord {
 		if (this.localNode != null) {
 			this.localNode.clearCallback();
 		}
+	}
+	
+	public Node getLocalNode(){
+		return this.localNode;
 	}
 
 }

@@ -1,5 +1,13 @@
 package de.haw.ttvp.chord;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
+import de.uniba.wiai.lspi.chord.com.CommunicationException;
+import de.uniba.wiai.lspi.chord.com.Node;
+import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.data.URL;
 import de.uniba.wiai.lspi.chord.service.Chord;
 import de.uniba.wiai.lspi.chord.service.impl.ChordImpl;
@@ -10,8 +18,9 @@ import de.uniba.wiai.lspi.chord.service.impl.ChordImpl;
  * @version 1.0.5
  */
 public final class RemoteChordNetworkAccess {
+	private static final Logger LOG = Logger.getLogger(RemoteChordNetworkAccess.class);
 
-	int protocolType = URL.SOCKET_PROTOCOL; 
+	int protocolType = URL.SOCKET_PROTOCOL;
 	
 	/**
 	 * Invisible constructor.
@@ -112,4 +121,58 @@ public final class RemoteChordNetworkAccess {
 	public Chord getChordInstance() {
 		return this.chordInstance;
 	}
+	
+	/**
+	 * <strong>Find Nodes</strong><br>
+	 * Find all Nodes currently present in Chord-Network
+	 * @return List of Nodes
+	 */
+	public List<ID> findNodes(){
+		LOG.info("Fetching all Nodes in Chord Network");
+		
+		// Fetch Chord Instance
+		ChordImpl chord = (ChordImpl) this.chordInstance;
+		
+		// This Nodes Information
+		ID ownId = chord.getID();
+		Node node = chord.getLocalNode();
+		
+		// List of Nodes in Chord-Network
+		List<ID> nodes = new ArrayList<ID>();
+		try {
+			findNextSuccessor(ownId, nodes, node, ownId);
+		} catch (CommunicationException e) {
+			LOG.error("ERROR: CommunicationException: "+e.getLocalizedMessage(), e);
+		}
+		
+		// Return List of Nodes in Chord-Network
+		return nodes;
+	}
+	
+	/**
+	 * <strong>Find Next Successor</strong><br>
+	 * Recursive Method to fetch all ChordNodes Successors currently present in the Network
+	 * Terminates if next Successor is Origin-Node or next Successor is already known
+	 * @param current
+	 * @param nodes
+	 * @param node
+	 * @param source
+	 * @throws CommunicationException
+	 */
+	private void findNextSuccessor(ID current, List<ID> nodes, Node node, ID source) throws CommunicationException {
+		LOG.info("Recursive Call to find next Successor for Node: "+current.toString()+" with Origin: "+source.toString());
+
+		// Find Successor for current Node
+		Node nextNode = node.findSuccessor(current.add(1));
+		ID next = nextNode.getNodeID();
+		
+		// Recursive Call if next Node is not this Node and next Node is not yet 
+		if(!next.equals(source)){
+			nodes.add(next);
+			findNextSuccessor(next, nodes, nextNode, source);
+		} else LOG.info("Successor Discorvery detected Nodes: "+nodes.size());
+		
+	}
+	
+	
 }

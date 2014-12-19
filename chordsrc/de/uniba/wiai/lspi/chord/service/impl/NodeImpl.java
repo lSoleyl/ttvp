@@ -27,7 +27,6 @@
  ***************************************************************************/
 package de.uniba.wiai.lspi.chord.service.impl;
 
-import de.haw.ttvp.Transaction;
 import static de.uniba.wiai.lspi.util.logging.Logger.LogLevel.DEBUG;
 import static de.uniba.wiai.lspi.util.logging.Logger.LogLevel.INFO;
 
@@ -39,6 +38,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import de.haw.ttvp.Transaction;
 import de.uniba.wiai.lspi.chord.com.Broadcast;
 import de.uniba.wiai.lspi.chord.com.CommunicationException;
 import de.uniba.wiai.lspi.chord.com.Endpoint;
@@ -49,7 +49,6 @@ import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.data.URL;
 import de.uniba.wiai.lspi.chord.service.NotifyCallback;
 import de.uniba.wiai.lspi.util.logging.Logger;
-import java.math.BigInteger;
 
 /**
  * Implements all operations which can be invoked remotely by other nodes.
