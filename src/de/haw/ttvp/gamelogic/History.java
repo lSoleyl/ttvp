@@ -57,4 +57,16 @@ public class History {
 	public List<HistoryEntry> getEntries(){
 		return this.entries;
 	}
+  
+  /** Returns the next transaction id according to the history.
+   * 
+   * @return a new transaction id
+   */
+  public int getNextID() {
+    if (entries.isEmpty())
+      return 0; //Keine ID bekannt, neue starten
+    
+    //Da entries nach transactionIds sortiert sind, liefert getLast() die höchste ID
+    return entries.getLast().transactionID + 1;
+  }
 }
