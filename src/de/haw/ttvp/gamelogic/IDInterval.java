@@ -38,4 +38,24 @@ public class IDInterval {
       currentID = currentID.add(stepSize);
     }
   }
+  
+  /** Looks up the given ID inside the intervallist and returns the ID which 
+   *  identifies the interval itself.
+   *
+   * @param target the ID to look up
+   * 
+   * @return the ID which identifies the interval(see 'ids'). Or null, if outside the interval
+   */
+  public ID getIntervalID(ID target) {
+    ID current = null;
+    for(ID i : ids) {
+      if (i.compareTo(target) > 0)
+        return current;
+      if (i.compareTo(target) == 0)
+        return i;
+      
+      current = i;
+    }
+    return null;
+  }
 }
