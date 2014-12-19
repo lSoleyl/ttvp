@@ -20,12 +20,14 @@ public class History {
 		public ID dstPlayer; 
 		public ID targetID;
 		public boolean hit;
+    public String sourceHost; //Der Computer, der uns diese Info gesendet hat.
 		
-		public HistoryEntry(int transactionID, ID dstPlayer, ID targetID, boolean hit) {
+		public HistoryEntry(int transactionID, ID dstPlayer, ID targetID, boolean hit, String sourceHost) {
 			this.transactionID = transactionID;
 			this.dstPlayer = dstPlayer;
 			this.targetID = targetID;
 			this.hit = hit;
+      this.sourceHost = sourceHost;
 		}
 		
 	}
@@ -56,8 +58,8 @@ public class History {
 		
 	}
   
-  public void addEntry(int transactionID,	ID dstPlayer, ID targetID, boolean hit) {
-    addEntry(new HistoryEntry(transactionID, dstPlayer, targetID, hit));
+  public void addEntry(int transactionID,	ID dstPlayer, ID targetID, boolean hit, String sourceHost) {
+    addEntry(new HistoryEntry(transactionID, dstPlayer, targetID, hit, sourceHost));
   }
 	
 	public List<HistoryEntry> getEntries(){

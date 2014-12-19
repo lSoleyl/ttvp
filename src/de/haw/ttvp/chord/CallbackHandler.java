@@ -36,12 +36,12 @@ public class CallbackHandler implements NotifyCallback {
   }
 
   @Override
-  public void broadcast(ID source, ID target, Boolean hit, int transactionID) {
+  public void broadcast(ID source, ID target, Boolean hit, int transactionID, String sourceHost) {
     //Hier nicht Game.waitReady(), da es nicht notwendig ist...
     Player dstPlayer = Game.instance.getPlayer(source);
     dstPlayer.setField(target, hit ? Field.SHIP : Field.NOTHING);
     
-    Game.instance.history.addEntry(transactionID, source, target, hit);
+    Game.instance.history.addEntry(transactionID, source, target, hit, sourceHost);
   }
 
 }

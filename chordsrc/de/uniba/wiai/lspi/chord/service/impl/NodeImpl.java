@@ -51,6 +51,9 @@ import de.uniba.wiai.lspi.chord.data.URL;
 import de.uniba.wiai.lspi.chord.service.NotifyCallback;
 import de.uniba.wiai.lspi.util.logging.Logger;
 import java.math.BigInteger;
+import java.rmi.server.RemoteServer;
+import java.rmi.server.ServerNotActiveException;
+import java.util.logging.Level;
 
 /**
  * Implements all operations which can be invoked remotely by other nodes.
@@ -464,7 +467,13 @@ public final class NodeImpl extends Node {
 		
 		//Broadcast an Anwendung weiterreichen
 		if (this.notifyCallback != null) {
-			this.notifyCallback.broadcast(info.getSource(), info.getTarget(), info.getHit(), info.getTransaction());
+      String callSource = "127.0.0.1"; //Default ist localhost
+      try {      
+        callSource = RemoteServer.getClientHost();
+      } catch (ServerNotActiveException ex) {} //Wenn Exception kam, dann haben wir broadcast() selbst aufgerufen
+      
+      
+			this.notifyCallback.broadcast(info.getSource(), info.getTarget(), info.getHit(), info.getTransaction(), callSource);
 		}
 	}
 
