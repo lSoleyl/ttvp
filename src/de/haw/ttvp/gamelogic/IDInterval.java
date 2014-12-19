@@ -20,6 +20,8 @@ public class IDInterval {
   public final ID from;
   public final ID to;
   
+  private BigInteger halfStepSize;
+  
   public ArrayList<ID> ids = new ArrayList<>(); //Liste mit unteren Intervallgrenzen der Teilintervalle
 
   public IDInterval(ID from, ID to, int intervals) {
@@ -31,6 +33,7 @@ public class IDInterval {
   private void populateIds(int intervals) {
     BigInteger intervalSize = from.distanceTo(to);
     BigInteger stepSize = intervalSize.divide(BigInteger.valueOf(intervals));
+    halfStepSize = stepSize.divide(BigInteger.valueOf(2));
     
     ID currentID = from.add(1); //Startwert aus dem Interval ausnehmen
     for (int c = 0; c < intervals; ++c) {
@@ -57,5 +60,18 @@ public class IDInterval {
       current = i;
     }
     return null;
+  }
+  
+  /**
+   * <strong>Get TargetID</strong><br>
+   * Returns the Target-ID for a given Element in this Interval
+   * @param idx
+   * @return Target ID
+   */
+  public ID getTargetID(int idx){
+	  ID targetID = ids.get(idx);
+	  
+	  // Calculate Target
+	  return targetID.add(halfStepSize);
   }
 }
