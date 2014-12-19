@@ -1,6 +1,7 @@
 package de.haw.ttvp.gamelogic;
 
 import de.haw.ttvp.Transaction;
+import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.util.logging.Logger;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,13 +18,13 @@ public class History {
 	public class HistoryEntry {
 		public int transactionID;
 		public Player dstPlayer;
-		public int slot;
+		public ID targetID;
 		public boolean hit;
 		
-		public HistoryEntry(int transactionID, Player dstPlayer, int slot, boolean hit) {
+		public HistoryEntry(int transactionID, Player dstPlayer, ID targetID, boolean hit) {
 			this.transactionID = transactionID;
 			this.dstPlayer = dstPlayer;
-			this.slot = slot;
+			this.targetID = targetID;
 			this.hit = hit;
 		}
 		
@@ -55,8 +56,8 @@ public class History {
 		
 	}
   
-  public void addEntry(int transactionID,	Player dstPlayer, int slot, boolean hit) {
-    addEntry(new HistoryEntry(transactionID, dstPlayer, slot, hit));
+  public void addEntry(int transactionID,	Player dstPlayer, ID targetID, boolean hit) {
+    addEntry(new HistoryEntry(transactionID, dstPlayer, targetID, hit));
   }
 	
 	public List<HistoryEntry> getEntries(){
