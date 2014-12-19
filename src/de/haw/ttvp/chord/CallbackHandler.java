@@ -1,5 +1,6 @@
 package de.haw.ttvp.chord;
 
+import de.haw.ttvp.gamelogic.Field;
 import de.haw.ttvp.gamelogic.Game;
 import de.haw.ttvp.gamelogic.Player;
 import de.uniba.wiai.lspi.chord.data.ID;
@@ -24,8 +25,12 @@ public class CallbackHandler implements NotifyCallback {
   }
 
   @Override
-  public void broadcast(ID source, ID target, Boolean hit) {
-    LOG.debug("NotifyCallback.broadcast(" + source.toString() + "," + target.toString() + "," + hit + ")");
+  public void broadcast(ID source, ID target, Boolean hit, int transactionID) {
+    //Hier nicht Game.waitReady(), da es nicht notwendig ist...
+    Player dstPlayer = Game.instance.getPlayer(source);
+    dstPlayer.setField(target, hit ? Field.SHIP : Field.NOTHING);
+    
+    Game.instance.history.addEntry(transactionID, dstPlayer, target, hit);
   }
 
 }
