@@ -1,17 +1,20 @@
 package de.haw.ttvp.gamelogic;
 
-import java.util.ArrayList;
+import de.haw.ttvp.Transaction;
+import de.uniba.wiai.lspi.util.logging.Logger;
+import java.util.LinkedList;
 import java.util.List;
 
 public class History {
-
-	private List<HistoryEntry> entries;
+  private static final Logger log = Logger.getLogger(History.class);
+  
+	private LinkedList<HistoryEntry> entries;
 	
 	public History(){
-		this.entries = new ArrayList<>();
+		this.entries = new LinkedList<>(); //Linked list performanter beim Einfügen.
 	}
 	
-	class HistoryEntry{
+	public class HistoryEntry {
 		public int transactionID;
 		public Player srcPlayer;
 		public Player dstPlayer;
@@ -31,8 +34,29 @@ public class History {
 	}
 	
 	public void addEntry(HistoryEntry entry){
-		this.entries.add(entry);
+    if (entries.isEmpty() || Transaction.validIDFrom(entries.getLast().transactionID, entry.transactionID))
+      entries.add(entry);
+    
+    //ID ist "out-of-order" oder ein Duplikat
+    for(int i = entries.size()-1; i >= 0; --i) {
+      HistoryEntry e = entries.get(i);
+      if (e.transactionID == entry.transactionID) {
+        log.warn("Dropping duplicate broadcast with Transaction-ID: " + e.transactionID);
+        //TODO prüfen, ob Einträge identisch sind und Unterschiede ausgeben
+        return;
+      }
+      if (Transaction.validIDFrom(e.transactionID, entry.transactionID)) {
+        entries.add(i, entry);
+        log.info("Added delayed Entry with Transaction-ID: " + entry.transactionID + ". Arrived out of order");
+        return;
+      }
+    } 
+		
 	}
+  
+  public void addEntry(int transactionID, Player srcPlayer,	Player dstPlayer, int slot, boolean hit) {
+    addEntry(new HistoryEntry(transactionID, srcPlayer, dstPlayer, slot, hit));
+  }
 	
 	public List<HistoryEntry> getEntries(){
 		return this.entries;
