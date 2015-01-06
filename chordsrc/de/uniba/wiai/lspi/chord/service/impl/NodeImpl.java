@@ -444,6 +444,19 @@ public final class NodeImpl extends Node {
       return;
     }
     
+    //Broadcast an Anwendung weiterreichen und erst dann weiterleiten
+    // falls andere Clients im Broadcast zurückschießen, bringt das so unsere History 
+    // nicht durcheiannder
+		if (this.notifyCallback != null) {
+      String callSource = "127.0.0.1"; //Default ist localhost
+      try {      
+        callSource = RemoteServer.getClientHost();
+      } catch (ServerNotActiveException ex) {} //Wenn Exception kam, dann haben wir broadcast() selbst aufgerufen
+      
+      
+			this.notifyCallback.broadcast(info.getSource(), info.getTarget(), info.getHit(), info.getTransaction(), callSource);
+		}
+    
     ID range = info.getRange();
     Node[] fingerTable = this.references.getFingerTableCopy();
       
@@ -464,17 +477,6 @@ public final class NodeImpl extends Node {
       Broadcast bInfo = new Broadcast(range, info.getSource(), info.getTarget(), info.getTransaction(), info.getHit());      
       receiver.broadcast(bInfo);
     }
-		
-		//Broadcast an Anwendung weiterreichen
-		if (this.notifyCallback != null) {
-      String callSource = "127.0.0.1"; //Default ist localhost
-      try {      
-        callSource = RemoteServer.getClientHost();
-      } catch (ServerNotActiveException ex) {} //Wenn Exception kam, dann haben wir broadcast() selbst aufgerufen
-      
-      
-			this.notifyCallback.broadcast(info.getSource(), info.getTarget(), info.getHit(), info.getTransaction(), callSource);
-		}
 	}
 
 }
