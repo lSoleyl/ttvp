@@ -3,9 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.haw.ttvp.gamelogic;
+package de.haw.ttvp.gamelogic.player;
 
+import de.haw.ttvp.gamelogic.Field;
 import static de.haw.ttvp.gamelogic.Field.*;
+import de.haw.ttvp.gamelogic.IDInterval;
 import de.uniba.wiai.lspi.chord.data.ID;
 
 public class KnownPlayer extends Player {

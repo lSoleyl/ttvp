@@ -1,8 +1,9 @@
-package de.haw.ttvp.gamelogic;
+package de.haw.ttvp.gamelogic.strategy;
 
-import java.util.List;
-
+import de.haw.ttvp.gamelogic.History;
+import de.haw.ttvp.gamelogic.player.Player;
 import de.uniba.wiai.lspi.chord.data.ID;
+import java.util.Map;
 
 /**
  * <strong>Strategy</strong><br>
@@ -12,11 +13,11 @@ import de.uniba.wiai.lspi.chord.data.ID;
  */
 public abstract class Strategy {
 
-	protected List<Player> player;
+	protected Map<ID,Player> playerMap;
 	protected History history;
 	
-	public Strategy(List<Player> player, History history){
-		this.player = player;
+	public Strategy(Map<ID,Player> playerMap, History history){
+		this.playerMap = playerMap;
 		this.history = history;
 	}
 	

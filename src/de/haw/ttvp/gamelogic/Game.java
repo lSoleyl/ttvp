@@ -1,6 +1,7 @@
 package de.haw.ttvp.gamelogic;
 
 import de.haw.ttvp.gamelogic.History.HistoryEntry;
+import de.haw.ttvp.gamelogic.player.*;
 import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.service.Chord;
 import de.uniba.wiai.lspi.chord.service.impl.ChordImpl;

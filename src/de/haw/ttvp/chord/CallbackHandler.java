@@ -2,7 +2,7 @@ package de.haw.ttvp.chord;
 
 import de.haw.ttvp.gamelogic.Field;
 import de.haw.ttvp.gamelogic.Game;
-import de.haw.ttvp.gamelogic.Player;
+import de.haw.ttvp.gamelogic.player.Player;
 import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.service.NotifyCallback;
 import org.apache.log4j.Logger;

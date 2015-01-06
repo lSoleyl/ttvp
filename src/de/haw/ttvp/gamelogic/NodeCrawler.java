@@ -1,5 +1,6 @@
 package de.haw.ttvp.gamelogic;
 
+import de.haw.ttvp.gamelogic.player.*;
 import de.uniba.wiai.lspi.chord.com.CommunicationException;
 import de.uniba.wiai.lspi.chord.com.Node;
 import de.uniba.wiai.lspi.chord.data.ID;
