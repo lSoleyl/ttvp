@@ -30,11 +30,8 @@ public class CallbackHandler implements NotifyCallback {
     }
     
     Game.instance.getChord().broadcast(target, hit); //Alle anderen Knoten benachrichtigen
-    
-    //TODO hier zurückzuschießen würde wahrscheinlich zu einem Stack-Overflow im Spiel führen
-    //     schließlich basiert die ganze Kommunikation auf RMI und die Aufrufe würden immer
-    //     weiter ineinander verschachtelt werden.
-    //     (Also Zielwahl und Retrieve aus anderem Thread heraus?)
+    Game.instance.shoot(); //Shoot kehrt sofort zurück und führt die Zielsuche 
+                           //und den Schuss von einem zweiten Thread durch. (Main-Thread)
   }
 
   @Override
@@ -44,6 +41,7 @@ public class CallbackHandler implements NotifyCallback {
     dstPlayer.setField(target, hit ? Field.SHIP : Field.NOTHING);
     
     //TODO erkennen, ob man gewonnen hat (man hat den Schuss für diesen Broadcast selbst abgegeben und der Spieler hat keine Schiffe mehr)
+    //TODO wenn gewonnen, dann TargetSelection-Thread benachrichtigen und History ausgeben
     
     Game.instance.history.addEntry(transactionID, source, target, hit, sourceHost);
   }

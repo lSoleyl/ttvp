@@ -24,10 +24,12 @@ public class Game {
   public static final int INTERVALS = 100;
   public static final int SHIPS = 10;
   public static Game instance = null;
+  public static final int TURN_DELAY_MS = 100;
   
   private static final Logger log = Logger.getLogger(Game.class);
   private boolean ready = false;
   private final Semaphore readyLock = new Semaphore(0);
+  private final Semaphore makeTurn = new Semaphore(0);
   
   public final Map<ID, Player> playerMap = new ConcurrentHashMap<>(); //Wird von dem Crawler-Thread mitbeschrieben
   public Player self;
@@ -97,17 +99,21 @@ public class Game {
           Thread.sleep(3000);
         } catch (InterruptedException ex) {}
         
-        //Ersten Schuss abgeben (müsste so stimmen...)
-        ID target = WeakestKnownTarget.instance().findTarget();
-        chord.retrieve(target);
+        shoot(); //Schuss abgeben
       }
       
-      //TODO mit irgendwas blockieren, bis das Spiel wirklich vorbei ist, 
-      //     verlässt der Hauptthread nämlich diese Methode, dann werden alle 
-      //     Threads inklusive Chrod mit "System.exit()" beendet.
-    } catch (GameError | ServiceException e) {
+      //Diesen Thread zur Zielwahl und zum Schießen nutzen.
+      new TargetSelection(makeTurn, chord).run();
+    } catch (GameError e) {
       log.error("Game aborted!\n", e);
     }
+  }
+  
+  /** This method issues the responsible Thread to select a target and
+   *  shoot at it. This is done by releasing a semaphore permit.
+   */
+  public void shoot() {
+    makeTurn.release();
   }
   
   private boolean isBeginningPlayer(IDInterval range) {
