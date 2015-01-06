@@ -28,6 +28,22 @@ public abstract class Player {
    */
   public abstract boolean hasShipAt(ID target);
   
+  /** This returns how many ships this player has already lost.
+   *  This implementation works for both kown and unknown players thanks to the
+   *  fact that no ship can be sunken twice.
+   * 
+   * @return number of ships, which have been destroyed
+   */
+  public int shipsLost() {
+    int lostShips = 0;
+    
+    for (Field field : fieldMap.values()) //Einfach alle "Schiff"-Felder zählen
+      if (field == Field.SHIP)
+        ++lostShips;
+      
+    return lostShips;
+  }
+  
   /** Set type of a field. If the given ID doesn't belong to this player
    *  nothing happens.
    * 
@@ -60,5 +76,13 @@ public abstract class Player {
   
   public Player makeKnown(IDInterval range) {
     return this;
+  }
+  
+  public KnownPlayer known() {
+    return null;
+  }
+  
+  public Map<ID, Field> getFieldMap() {
+    return fieldMap;
   }
 }

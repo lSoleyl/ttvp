@@ -50,4 +50,24 @@ public class KnownPlayer extends Player {
     return true;
   }
   
+  /** Returns the amount of unknown slots.
+   */ 
+  public int unknownSlots() {
+    int unknown = 0;
+    
+    for (Field field : fieldMap.values())
+      if (field == UNKNOWN)
+        ++unknown;
+    
+    return unknown;
+  }
+  
+  @Override
+  public KnownPlayer known() {
+    return this;
+  }
+  
+  public IDInterval getInterval() {
+    return interval;
+  }
 }

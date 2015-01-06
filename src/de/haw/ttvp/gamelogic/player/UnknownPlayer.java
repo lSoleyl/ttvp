@@ -33,7 +33,7 @@ public class UnknownPlayer extends Player {
    *  Synchronized, because it might conflict with makeKnown()
    */
   @Override
-  public synchronized void setField(ID target, Field type) {
+  public void setField(ID target, Field type) {
     fieldMap.put(target, type);
   }
 
@@ -52,7 +52,7 @@ public class UnknownPlayer extends Player {
    * @return a new KnownPlayer
    */
   @Override
-  public synchronized Player makeKnown(IDInterval range) {
+  public Player makeKnown(IDInterval range) {
     Player knownPlayer = new KnownPlayer(nodeID, range);
     
     //Bekannte Informationen auf neuen Spieler übertragen
