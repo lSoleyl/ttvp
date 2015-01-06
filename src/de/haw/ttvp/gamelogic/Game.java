@@ -2,8 +2,10 @@ package de.haw.ttvp.gamelogic;
 
 import de.haw.ttvp.gamelogic.History.HistoryEntry;
 import de.haw.ttvp.gamelogic.player.*;
+import de.haw.ttvp.gamelogic.strategy.WeakestKnownTarget;
 import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.service.Chord;
+import de.uniba.wiai.lspi.chord.service.ServiceException;
 import de.uniba.wiai.lspi.chord.service.impl.ChordImpl;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -94,9 +96,16 @@ public class Game {
         try {
           Thread.sleep(3000);
         } catch (InterruptedException ex) {}
-        //TODO ersten Schuss abgegben
+        
+        //Ersten Schuss abgeben (müsste so stimmen...)
+        ID target = WeakestKnownTarget.instance().findTarget();
+        chord.retrieve(target);
       }
-    } catch (GameError e) {
+      
+      //TODO mit irgendwas blockieren, bis das Spiel wirklich vorbei ist, 
+      //     verlässt der Hauptthread nämlich diese Methode, dann werden alle 
+      //     Threads inklusive Chrod mit "System.exit()" beendet.
+    } catch (GameError | ServiceException e) {
       log.error("Game aborted!\n", e);
     }
   }

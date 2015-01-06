@@ -31,8 +31,10 @@ public class CallbackHandler implements NotifyCallback {
     
     Game.instance.getChord().broadcast(target, hit); //Alle anderen Knoten benachrichtigen
     
-    //TODO Strategie auswählen und zurückfeuern
-    //TODO vlt. 10-100 Millisekunden sleep? (Damit der Crawler Zeit hat Informationen zu sammeln und das Spiel nicht zu schnell vorbei ist)
+    //TODO hier zurückzuschießen würde wahrscheinlich zu einem Stack-Overflow im Spiel führen
+    //     schließlich basiert die ganze Kommunikation auf RMI und die Aufrufe würden immer
+    //     weiter ineinander verschachtelt werden.
+    //     (Also Zielwahl und Retrieve aus anderem Thread heraus?)
   }
 
   @Override
@@ -40,6 +42,8 @@ public class CallbackHandler implements NotifyCallback {
     //Hier nicht Game.waitReady(), da es nicht notwendig ist...
     Player dstPlayer = Game.instance.getPlayer(source);
     dstPlayer.setField(target, hit ? Field.SHIP : Field.NOTHING);
+    
+    //TODO erkennen, ob man gewonnen hat (man hat den Schuss für diesen Broadcast selbst abgegeben und der Spieler hat keine Schiffe mehr)
     
     Game.instance.history.addEntry(transactionID, source, target, hit, sourceHost);
   }

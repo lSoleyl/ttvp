@@ -3,7 +3,6 @@ package de.haw.ttvp.gamelogic.strategy;
 import de.haw.ttvp.gamelogic.Field;
 import de.haw.ttvp.gamelogic.player.KnownPlayer;
 import de.uniba.wiai.lspi.chord.data.ID;
-import java.util.Collection;
 import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 
@@ -12,7 +11,8 @@ import org.apache.log4j.Logger;
  * 
  */
 public class WeakestKnownTarget extends Strategy {
-  public final Logger log = Logger.getLogger(WeakestKnownTarget.class);
+  private final Logger log = Logger.getLogger(WeakestKnownTarget.class);
+  private static Strategy instance = null;
   
   @Override
   public ID findTarget() {
@@ -36,6 +36,10 @@ public class WeakestKnownTarget extends Strategy {
      return null;
   }
 
-  
-  
+  public static Strategy instance() {
+    if (instance == null)
+      instance = new WeakestKnownTarget();
+    
+    return instance;    
+  }
 }
