@@ -80,4 +80,8 @@ public class IDInterval {
 	  // Calculate Target
 	  return targetID.add(halfStepSize);
   }
+  
+  public ID getTargetID(ID rangeBegin) {
+    return rangeBegin.add(halfStepSize);
+  }
 }
