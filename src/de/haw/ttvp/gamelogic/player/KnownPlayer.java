@@ -45,4 +45,9 @@ public class KnownPlayer extends Player {
     return null; //Feld nicht im Spielerintervall      
   }
   
+  @Override
+  public boolean isKnown() {
+    return true;
+  }
+  
 }

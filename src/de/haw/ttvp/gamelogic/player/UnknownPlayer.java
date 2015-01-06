@@ -51,6 +51,7 @@ public class UnknownPlayer extends Player {
    * @param range the interval Range, which defines this node
    * @return a new KnownPlayer
    */
+  @Override
   public synchronized Player makeKnown(IDInterval range) {
     Player knownPlayer = new KnownPlayer(nodeID, range);
     

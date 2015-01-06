@@ -6,6 +6,7 @@
 package de.haw.ttvp.gamelogic.player;
 
 import de.haw.ttvp.gamelogic.Field;
+import de.haw.ttvp.gamelogic.IDInterval;
 import de.uniba.wiai.lspi.chord.data.ID;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,5 +52,13 @@ public abstract class Player {
    */
   public ID getID() {
     return nodeID;
+  }
+  
+  public boolean isKnown() {
+    return false;
+  }
+  
+  public Player makeKnown(IDInterval range) {
+    return this;
   }
 }

@@ -29,7 +29,7 @@ public class Game {
   
   public final Map<ID, Player> playerMap = new ConcurrentHashMap<>(); //Wird von dem Crawler-Thread mitbeschrieben
   public Player self;
-  public History history;
+  public final History history = new History();
   
   private final Chord chord;
 
@@ -37,7 +37,6 @@ public class Game {
   
   public Game(Chord network) {
     this.chord = network;
-    this.history = new History();
     Game.instance = this;
   }
   
@@ -67,8 +66,8 @@ public class Game {
   public void addKnownPlayer(ID nodeID, IDInterval range) {
     if (playerMap.containsKey(nodeID)) {
       Player p = playerMap.get(nodeID);
-      if (p instanceof UnknownPlayer) { //Wenn es sich um einen UnknownPlayer handelt, dann kovertieren
-        playerMap.put(nodeID, ((UnknownPlayer)p).makeKnown(range));
+      if (!p.isKnown()) { //Wenn es sich um einen UnknownPlayer handelt, dann kovertieren
+        playerMap.put(nodeID, p.makeKnown(range));
       }
     } else { //Neuen Spieler anlegen.
       playerMap.put(nodeID, new KnownPlayer(nodeID, range));
