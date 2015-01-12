@@ -100,6 +100,8 @@ public class Game {
         } catch (InterruptedException ex) {}
         
         shoot(); //Schuss abgeben
+      } else { 
+        log.info("Waiting for other player to start the game");
       }
       
       //Diesen Thread zur Zielwahl und zum Schießen nutzen.

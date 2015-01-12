@@ -18,8 +18,10 @@ public class TargetSelection {
   }  
   
   public void run() throws GameError {
+    log.info("Thread now running target selection");
     while(true) { //TODO Schleife verlassen, wenn das Spiel gewonnen ist.
       try {
+        log.debug("Waiting for my next turn");
         makeTurn.acquire(); //Auf nächsten Zug warten
         Thread.sleep(Game.TURN_DELAY_MS); //Kurz warten
       } catch (InterruptedException ex) {
