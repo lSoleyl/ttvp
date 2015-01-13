@@ -11,6 +11,7 @@ import java.util.ArrayList;
  * 
  * Bsp: Int(0,93,10) -> [1-10][11-20][21-30]...[81-83] (Rest wird auf das letzte Intervall gelegt)
  *      Als ID-Array -> 1,11,21,...,81 (Das ID-Array enthält die kleineren Werte des Intervals)
+ *      (In die untere grenze inklusiv, die obere (nächster Wert) exklusiv)
  * 
  * Bsp2: Int(20,10,10) [Bei einem ID-Ring von 100 Elementen]
  *          -> [21-29][30-38][39-47][48-56][57-65] [66-74][75-83][84-92][93-99&0-1][2-10]
@@ -72,6 +73,15 @@ public class IDInterval {
     }
     
     return null;
+  }
+  
+  public boolean contains(ID id) {
+    if (from.compareTo(to) <= 0) {
+      return id.compareTo(from) > 0 && id.compareTo(to) <= 0;
+    } else { //Überlaufintervall
+      return (id.compareTo(from) > 0 && id.compareTo(ID.MAX_ID) <= 0) ||
+             (id.compareTo(ID.MIN_ID) >= 0 && id.compareTo(to) <= 0);
+    }
   }
   
   /**

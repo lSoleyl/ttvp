@@ -434,9 +434,7 @@ public final class NodeImpl extends Node {
 	
 	@Override
 	public final void broadcast(Broadcast info) throws CommunicationException {
-		if (this.logger.isEnabledFor(DEBUG)) {
-			this.logger.debug(" Send broadcast message");
-		}
+		logger.debug("Sending broadcast message");
     
     //Prüfen, ob die ID eine aufsteigende ist
     if (Game.instance != null && Game.instance.history.isSimpleDuplicate(info.getTransaction())) {
@@ -459,7 +457,13 @@ public final class NodeImpl extends Node {
     
     ID range = info.getRange();
     Node[] fingerTable = this.references.getFingerTableCopy();
-      
+    
+    //Abbruchbedingung (Broadcast endet im eigenen Bereich)
+    if (Game.instance.self.known().getInterval().contains(range)) {
+      logger.debug("Broadcast ends in this node");
+      return;
+    }
+    
     //An alle Knoten der Finger-Table weitersenden, die sich im Intervall [this.id; range] befinden
     for(int c = 0; c < fingerTable.length && fingerTable[c].getNodeID().isInInterval(nodeID, range); ++c) {
       Node receiver = fingerTable[c];
@@ -475,6 +479,9 @@ public final class NodeImpl extends Node {
       
       //Neue BroadcastInfo bauen und Broadcast an Knoten weiterleiten
       Broadcast bInfo = new Broadcast(range, info.getSource(), info.getTarget(), info.getTransaction(), info.getHit());      
+      
+      logger.debug("Sending Broadcast: " + bInfo);
+      
       receiver.broadcast(bInfo);
     }
 	}
