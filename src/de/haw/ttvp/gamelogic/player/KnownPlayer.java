@@ -16,8 +16,15 @@ public class KnownPlayer extends Player {
   public KnownPlayer(ID nodeID, IDInterval interval) {
     super(nodeID);
     this.interval = interval;
+    initFields();
   }
   
+  /** Initialize all fields with UNKNOWN value
+   */
+  private void initFields() {
+    for(ID slotID : interval.ids)
+      fieldMap.put(slotID, UNKNOWN);
+  }
   
   @Override
   public boolean hasShipAt(ID target) {
