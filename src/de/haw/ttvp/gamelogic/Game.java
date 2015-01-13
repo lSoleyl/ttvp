@@ -2,19 +2,16 @@ package de.haw.ttvp.gamelogic;
 
 import de.haw.ttvp.gamelogic.History.HistoryEntry;
 import de.haw.ttvp.gamelogic.player.*;
-import de.haw.ttvp.gamelogic.strategy.WeakestKnownTarget;
+import de.haw.ttvp.ui.Dialog;
 import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.service.Chord;
-import de.uniba.wiai.lspi.chord.service.ServiceException;
 import de.uniba.wiai.lspi.chord.service.impl.ChordImpl;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
-import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
 
 
@@ -80,7 +77,7 @@ public class Game {
   }
   
   public void start() {
-    if (JOptionPane.showConfirmDialog(null, "Start Game?", "User action", JOptionPane.YES_NO_OPTION) != 0) {
+    if (!Dialog.confirm("Start Game?", "User action")) {
       log.warn("Game start aborted.");
       return;
     }
