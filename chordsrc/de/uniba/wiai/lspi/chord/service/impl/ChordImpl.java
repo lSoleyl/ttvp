@@ -1119,13 +1119,13 @@ public final class ChordImpl implements Chord, Report, AsynChord {
    */
 	@Override
 	public void broadcast (ID target, Boolean hit) {
-		//Range berechnen (= NodeID-1 damit die Message einmal um den gesamten Ring geht und den Knoten selbst nicht mehr erreicht)
-    ID range = this.getPredecessorID();
+		//Range berechnen (= predecessorID damit die Message einmal um den gesamten Ring geht und den Knoten selbst nicht mehr erreicht)
+    ID range = localNode.getNodeID().add(-1);
     
-    Broadcast info = new Broadcast(range, this.localNode.getNodeID(), target, Game.instance.history.getNextID(), hit);
+    Broadcast info = new Broadcast(range, localNode.getNodeID(), target, Game.instance.history.getNextID(), hit);
     
     try {    		
-      this.localNode.broadcast(info);
+      localNode.broadcast(info);
     } catch (CommunicationException ex) {
       logger.error("Failed to send a broadcast message.", ex);
     }

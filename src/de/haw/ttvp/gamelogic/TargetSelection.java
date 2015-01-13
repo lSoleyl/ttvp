@@ -31,6 +31,7 @@ public class TargetSelection {
       //TODO strategie wählen
       //Ziel wählen und Schuss abgeben
       ID target = WeakestKnownTarget.instance().findTarget();
+      log.debug("Shooting at ID: " + target);
       try {
         chord.retrieve(target);
       } catch (ServiceException e) {
