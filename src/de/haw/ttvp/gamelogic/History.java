@@ -38,8 +38,10 @@ public class History {
   }
 	
 	public void addEntry(HistoryEntry entry){
-    if (entries.isEmpty() || Transaction.validIDFrom(entries.getLast().transactionID, entry.transactionID))
+    if (entries.isEmpty() || Transaction.validIDFrom(entries.getLast().transactionID, entry.transactionID)) {
       entries.add(entry);
+      return;
+    }
     
     //ID ist "out-of-order" oder ein Duplikat
     for(int i = entries.size()-1; i >= 0; --i) {

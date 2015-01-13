@@ -36,6 +36,7 @@ public class CallbackHandler implements NotifyCallback {
 
   @Override
   public void broadcast(ID source, ID target, Boolean hit, int transactionID, String sourceHost) {
+    LOG.debug("NotifyCallback.broadcast(" + source + ", " + target + ", " + hit + ", " + transactionID + ", " + sourceHost + ")");
     //Hier nicht Game.waitReady(), da es nicht notwendig ist...
     Player dstPlayer = Game.instance.getPlayer(source);
     dstPlayer.setField(target, hit ? Field.SHIP : Field.NOTHING);
