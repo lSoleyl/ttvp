@@ -118,15 +118,13 @@ public class Game {
     makeTurn.release();
   }
   
-  private boolean isBeginningPlayer(IDInterval range) {
-    BigInteger maxID = BigInteger.valueOf(2).pow(160).subtract(BigInteger.ONE);
-    
+  private boolean isBeginningPlayer(IDInterval range) {    
     log.debug(" ID-Range ");
     log.debug(" from: " + range.from.toHexString());
     log.debug("   to: " + range.to.toHexString());
-    log.debug("maxID: " + ID.valueOf(maxID).toHexString());
+    log.debug("maxID: " + ID.MAX_ID);
     
-    return range.getIntervalID(ID.valueOf(maxID)) != null;      
+    return range.getIntervalID(ID.MAX_ID) != null;      
   }
   
   private IDInterval getNodeRange() throws GameError {
