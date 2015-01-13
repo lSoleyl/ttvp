@@ -21,6 +21,7 @@ public class WeakestKnownTarget extends Strategy {
      
      if (player != null) {
        log.info("Targeting player: " + player.getID());
+       log.debug("He has lost " + player.shipsLost() + " ships. And has " + player.unknownSlots() + " UNKNOWN slots left.");
        
        //Find first unknown slot of the player
        for (Entry<ID,Field> entry : player.getFieldMap().entrySet())

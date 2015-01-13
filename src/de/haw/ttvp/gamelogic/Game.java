@@ -22,7 +22,7 @@ public class Game {
   public static final int SHIPS = 10;
   public static Game instance = null;
   public static final int TURN_DELAY_MS = 100;
-  public static final boolean USE_SIMPLE_BROADCAST = true; //Nur über den Successor broadcasten
+  public static final boolean USE_SIMPLE_BROADCAST = false; //Nur über den Successor broadcasten
   
   private static final Logger log = Logger.getLogger(Game.class);
   private boolean ready = false;

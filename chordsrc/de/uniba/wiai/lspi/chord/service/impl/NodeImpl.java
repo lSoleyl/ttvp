@@ -51,6 +51,7 @@ import static de.uniba.wiai.lspi.util.logging.Logger.LogLevel.*;
 import java.math.BigInteger;
 import java.rmi.server.RemoteServer;
 import java.rmi.server.ServerNotActiveException;
+import java.util.ArrayList;
 
 /**
  * Implements all operations which can be invoked remotely by other nodes.
@@ -428,6 +429,21 @@ public final class NodeImpl extends Node {
 	final Executor getAsyncExecutor() {
 		return this.asyncExecutor;
 	}
+  
+  private List<Node> uniqueFingerTable() {
+    List<Node> result = new ArrayList<>();
+    Node[] fingerTable = this.references.getFingerTableCopy();
+    Node lastNode = null;
+    
+    for(Node entry : fingerTable) {
+      if (entry != lastNode && entry != null) {
+        lastNode = entry;
+        result.add(entry);
+      }
+    }
+    
+    return result;
+  }
 	
 	@Override
 	public final void broadcast(Broadcast info) throws CommunicationException {
@@ -455,9 +471,11 @@ public final class NodeImpl extends Node {
     
     
     ID range = info.getRange();
-    Node[] fingerTable = this.references.getFingerTableCopy();
+    List<Node> fingerTable = uniqueFingerTable();
     
-    //TODO wo entstehen Duplikate?  
+    if (range.equals(nodeID)) //Broadcast endet hier
+      return;
+    
     if (Game.USE_SIMPLE_BROADCAST) { //Nur an successor weiterleiten
       Node receiver = this.references.getSuccessor();
       if (range.isInInterval(nodeID, receiver.getNodeID())) //Broadcast endet zwischen zwei Knoten
@@ -465,21 +483,20 @@ public final class NodeImpl extends Node {
       logger.debug("Sending Broadcast: " + info);
       receiver.broadcast(info);
     } else { //An alle Knoten der Finger-Table weitersenden, die sich im Intervall [this.id; range] befinden
-      //TODO fehler fixen
-      for(int c = 0; c < fingerTable.length && fingerTable[c].getNodeID().isInInterval(nodeID, range); ++c) {
-        Node receiver = fingerTable[c];
+      for(int c = 0; c < fingerTable.size() && fingerTable.get(c).getNodeID().isInInterval(nodeID, range); ++c) {
+        Node receiver = fingerTable.get(c);
 
         ID subRange = range;
-        if (fingerTable.length < c+1) { //gibt es einen nächsten Knoten in der Finger-Table?
-          ID successorID = fingerTable[c+1].getNodeID();
+        if (fingerTable.size() < c+1) { //gibt es einen nächsten Knoten in der Finger-Table?
+          ID successorID = fingerTable.get(c+1).getNodeID();
           //Prüfen, ob der nächste Eintrag der Finger-Table zwischen dem aktuellen Eintrag und Range liegt.
           //Wenn ja, dann die Range entsprechend einschräbnken, die an den aktuellen Knoten gesendet wird. (So, dass der nächste Knoten den Broadcast nicht mehr erhält)
           if (successorID.isInInterval(nodeID, range))
-            range = successorID.add(-1); //-1, um den nachfolgenden Eintrag auszuschließen
+            subRange = successorID.add(-1); //-1, um den nachfolgenden Eintrag auszuschließen
         }
 
         //Neue BroadcastInfo bauen und Broadcast an Knoten weiterleiten
-        Broadcast bInfo = new Broadcast(range, info.getSource(), info.getTarget(), info.getTransaction(), info.getHit());      
+        Broadcast bInfo = new Broadcast(subRange, info.getSource(), info.getTarget(), info.getTransaction(), info.getHit());      
         logger.debug("Sending Broadcast: " + bInfo);
         receiver.broadcast(bInfo);
       }

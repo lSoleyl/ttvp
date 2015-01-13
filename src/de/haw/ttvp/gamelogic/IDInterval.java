@@ -58,19 +58,16 @@ public class IDInterval {
    */
   public ID getIntervalID(ID target) {
     
-    for(int c = 1; c < ids.size(); ++c) {
-      ID intervalStart = ids.get(c-1);
-      ID intervalEnd = ids.get(c).add(-1);
+    for(int c = 0; c+1 < ids.size(); ++c) {
+      ID intervalStart = ids.get(c).add(-1);
+      ID intervalEnd = ids.get(c+1);
       
-      if (intervalStart.compareTo(target) <= 0 && intervalEnd.compareTo(target) >= 0) { //Genau im Interval
-        return intervalStart;
-      } else if (intervalStart.compareTo(intervalEnd) > 0) { //Überlauf
-        if (intervalStart.compareTo(target) <= 0 && ID.MAX_ID.compareTo(target) >= 0) //Vor 0x00
-          return intervalStart;
-        else if (ID.MIN_ID.compareTo(target) <= 0 && intervalEnd.compareTo(target) >= 0) //Nach 0x00
-          return intervalStart;
-      }
+      if (target.isInInterval(intervalStart, intervalEnd))
+        return ids.get(c);
     }
+    
+    if (target.isInInterval(ids.get(ids.size()-1).add(-1), to))
+      return ids.get(ids.size()-1);
     
     return null;
   }
