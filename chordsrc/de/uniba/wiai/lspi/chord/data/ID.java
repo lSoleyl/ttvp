@@ -128,7 +128,7 @@ public final class ID implements Comparable<ID>, Serializable {
   public ID add(BigInteger value) {
     BigInteger idValue = toBigInteger().add(value);
     //Modulo Ringgröße
-    BigInteger base = BigInteger.valueOf(2).pow(id.length);
+    BigInteger base = ID.MAX_ID.toBigInteger();
     idValue = idValue.mod(base);
     return ID.valueOf(idValue);
   }
