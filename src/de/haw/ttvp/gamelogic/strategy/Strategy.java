@@ -41,7 +41,7 @@ public abstract class Strategy {
     KnownPlayer weakestPlayer = null;
     
     for (Player player : playerMap.values()) {
-      if (player.isKnown() ||  player != Game.instance.self) { //Unbekannte Spieler ignorieren
+      if (player.isKnown() &&  player != Game.instance.self) { //Unbekannte Spieler ignorieren
         if (weakestPlayer == null) { //Noch kein Spieler vorhanden zum Vergleich
           weakestPlayer = player.known();
           continue;
