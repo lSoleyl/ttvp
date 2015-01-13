@@ -20,7 +20,8 @@ public class Main {
 	
 	// Chord Bootstrap Parameters
 	private static String ip;
-	private static String port;
+	private static int lport;
+  private static int rport;
 	private static URL connectURL;
 	
 	/**
@@ -52,11 +53,16 @@ public class Main {
 	 * @throws Exception
 	 */
 	public static boolean init(String[] args) throws Exception{
+    lport = DefaultListenPort;
+    rport = lport;
+    
 		// Define Options for CommandLine Input
 		Options opts = new Options();
 		
 		opts.addOption("ip", true, "Chord Network Bootstrap-Address\nIf not provided, new Chord-Network will be started");
-		opts.addOption("port", true, "Chord Network Bootstrap-Port\nDefault: "+DefaultListenPort);
+		opts.addOption("port", true, "Chord Network local and remote port\nDefault: "+DefaultListenPort);
+    opts.addOption("lport", true, "Chord local listen port");
+    opts.addOption("rport", true, "Chord remote connect port");
 		opts.addOption("debug", false, "Reserved for Debug-Functionality");
 		opts.addOption("help", false, "Print usage");
 		
@@ -74,35 +80,41 @@ public class Main {
 		
 		// Parse Port from CommandLine or use default
 		if(cliParser.hasOption("port")){
-			port = cliParser.getOptionValue("port");
-		} else port = DefaultListenPort.toString();
+			lport = Integer.parseInt(cliParser.getOptionValue("port"));
+      rport = lport;
+		}
+    
+    if (cliParser.hasOption("lport"))
+      lport = Integer.parseInt(cliParser.getOptionValue("lport"));
+    
+    if (cliParser.hasOption("rport"))
+      rport = Integer.parseInt(cliParser.getOptionValue("rport"));
 		
-		LOG.debug("Port set to: "+port);
+		LOG.debug("local port set to: "+ lport);
+    LOG.debug("remote port set to: " + rport);
 		
 		// Parse Bootstrap-Address
 		if(cliParser.hasOption("ip")){
 			ip = cliParser.getOptionValue("ip");
-			connectURL = new URL(URLPrefix + ip + ":" + port + "/");
+			connectURL = new URL(URLPrefix + ip + ":" + rport + "/");
 			
 			LOG.info("Joining chord network at "+ connectURL.toString());
-		} LOG.info("Starting new chord Network.");
+		} else {
+      LOG.info("Starting new chord Network at port: " + lport);
+    }
 		
 		// Loading Chord.properties File
 		PropertiesLoader.loadPropertyFile();
-	    RemoteChordNetworkAccess network = RemoteChordNetworkAccess.getUniqueInstance();
-	    network.join(connectURL, DefaultListenPort);
-	    
-	    Chord chord = network.getChordInstance();
-	    
-	    Game game = new Game(chord);
-	    game.start();
-	    
-	    //TODO this will be send whenever someone retrieves a key from our keyspace
-	    //     the targetID will then be the retrieved keyID
-	    //chord.broadcast(null, Boolean.TRUE);
-		
-	    // Finally return SUCCESSFUL
-	    return true;
+    RemoteChordNetworkAccess network = RemoteChordNetworkAccess.getUniqueInstance();
+    network.join(connectURL, lport);
+
+    Chord chord = network.getChordInstance();
+
+    Game game = new Game(chord);
+    game.start();
+
+    // Finally return SUCCESSFUL
+    return true;
 	}
 	
 	/**

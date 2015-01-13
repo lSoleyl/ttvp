@@ -63,7 +63,7 @@ public class IDInterval {
       
       if (intervalStart.compareTo(target) <= 0 && intervalEnd.compareTo(target) >= 0) { //Genau im Interval
         return intervalStart;
-      } else if (intervalStart.compareTo(ID.MAX_ID) <= 0 && intervalEnd.compareTo(ID.MIN_ID) >= 0) { //Überlauf
+      } else if (intervalStart.compareTo(intervalEnd) > 0) { //Überlauf
         if (intervalStart.compareTo(target) <= 0 && ID.MAX_ID.compareTo(target) >= 0) //Vor 0x00
           return intervalStart;
         else if (ID.MIN_ID.compareTo(target) <= 0 && intervalEnd.compareTo(target) >= 0) //Nach 0x00
