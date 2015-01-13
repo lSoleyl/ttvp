@@ -94,7 +94,7 @@ public class Game {
       setReady();
       
       if (isBeginningPlayer(idRange)) {
-        log.info("I am staring the Game in 3 seconds...");
+        log.info("I am starting the Game in 3 seconds...");
         try {
           Thread.sleep(3000);
         } catch (InterruptedException ex) {}
@@ -120,6 +120,12 @@ public class Game {
   
   private boolean isBeginningPlayer(IDInterval range) {
     BigInteger maxID = BigInteger.valueOf(2).pow(160).subtract(BigInteger.ONE);
+    
+    log.debug(" ID-Range ");
+    log.debug(" from: " + range.from.toHexString());
+    log.debug("   to: " + range.to.toHexString());
+    log.debug("maxID: " + ID.valueOf(maxID).toHexString());
+    
     return range.getIntervalID(ID.valueOf(maxID)) != null;      
   }
   

@@ -47,7 +47,8 @@ import java.util.Arrays;
  * @version 1.0.5
  */
 public final class ID implements Comparable<ID>, Serializable {
-
+  public static ID MIN_ID = ID.valueOf(BigInteger.ZERO);
+  public static ID MAX_ID = ID.valueOf(BigInteger.valueOf(2).pow(160).subtract(BigInteger.ONE));
 	/**
 	 * 
 	 */
