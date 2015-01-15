@@ -24,14 +24,17 @@ public class NodeCrawler extends Thread {
   
   @Override
   public void run() {
+    log.info("starting crawler");
     Node localNode = chord.getLocalNode();
     ID current = localNode.getNodeID();
     ID predecessor = current;
     
     while(true) {
       try {
+        log.debug("calling findSuccessor(" + current.add(1) + ")");
         Node remote = localNode.findSuccessor(current.add(1));
         ID nodeID = remote.getNodeID();
+        log.debug("findSucessor() returned new node with ID: " + nodeID);
        
         if (nodeID.equals(localNode.getNodeID())) //Abbbruchbedingung, Ring vollständig durchlaufen
           break;
@@ -53,11 +56,13 @@ public class NodeCrawler extends Thread {
         }
       } 
     }
+    log.debug("crawler found all nodes");
     Game.instance.reapplyHistory();
     
     //Prüfen, ob nun alle Nodes "known" sind, was eigentlich der Fall sein sollte.
     //Ansonsten haben wir Knoten in der Liste, die nicht im Ring existieren
     checkNodes();
+    log.info("crawler finished");
   }
 
   private void checkNodes() {

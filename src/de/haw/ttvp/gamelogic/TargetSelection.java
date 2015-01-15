@@ -31,9 +31,11 @@ public class TargetSelection {
       //TODO strategie wählen
       //Ziel wählen und Schuss abgeben
       ID target = WeakestKnownTarget.instance().findTarget();
-      log.debug("Shooting at ID: " + target);
+      log.info("Shooting at ID: " + target);
       try {
+        log.debug("calling retrive(" + target + ")");
         chord.retrieve(target);
+        log.debug("retrive() returned");
       } catch (ServiceException e) {
         log.error("Retrieve on ID : " + target + " failed with error:\n", e);
         throw new GameError("TargetSelection can't proceed, retrieve() failed!");
