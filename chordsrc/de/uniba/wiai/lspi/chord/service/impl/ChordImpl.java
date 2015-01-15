@@ -1119,8 +1119,9 @@ public final class ChordImpl implements Chord, Report, AsynChord {
    */
 	@Override
 	public void broadcast (ID target, Boolean hit) {
-		//Range berechnen (= predecessorID damit die Message einmal um den gesamten Ring geht und den Knoten selbst nicht mehr erreicht)
-    ID range = localNode.getNodeID().add(-1);
+		//Range berechnen (= eigene ID damit die Message einmal um den gesamten Ring 
+    // geht und den Knoten selbst nicht mehr erreicht)
+    ID range = localNode.getNodeID();
     
     Broadcast info = new Broadcast(range, localNode.getNodeID(), target, Game.instance.history.getNextID(), hit);
     

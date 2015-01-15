@@ -469,20 +469,20 @@ public final class NodeImpl extends Node {
 			this.notifyCallback.broadcast(info.getSource(), info.getTarget(), info.getHit(), info.getTransaction(), callSource);
 		}
     
-    
-    ID range = info.getRange();
+    /*
+      Die Range sagt aus, dass alle Knoten im Intervall [this.nodeID; range) 
+      benachrichtigt werden sollen.
+    */
+    ID range = info.getRange(); 
     List<Node> fingerTable = uniqueFingerTable();
-    
-    if (range.equals(nodeID)) //Broadcast endet hier
-      return;
     
     if (Game.USE_SIMPLE_BROADCAST) { //Nur an successor weiterleiten
       Node receiver = this.references.getSuccessor();
-      if (range.isInInterval(nodeID, receiver.getNodeID())) //Broadcast endet zwischen zwei Knoten
-        return;
-      logger.debug("Sending Broadcast: " + info);
-      receiver.broadcast(info);
-    } else { //An alle Knoten der Finger-Table weitersenden, die sich im Intervall [this.id; range] befinden
+      if (receiver.getNodeID().isInInterval(nodeID, range)) { //Receiver im Broadcast-Intervall
+        logger.debug("Sending Broadcast: " + info);
+        receiver.broadcast(info);
+      }
+    } else { //An alle Knoten der Finger-Table weitersenden, die sich im Intervall [this.id; range) befinden
       for(int c = 0; c < fingerTable.size() && fingerTable.get(c).getNodeID().isInInterval(nodeID, range); ++c) {
         Node receiver = fingerTable.get(c);
 
@@ -490,9 +490,10 @@ public final class NodeImpl extends Node {
         if (fingerTable.size() < c+1) { //gibt es einen nächsten Knoten in der Finger-Table?
           ID successorID = fingerTable.get(c+1).getNodeID();
           //Prüfen, ob der nächste Eintrag der Finger-Table zwischen dem aktuellen Eintrag und Range liegt.
-          //Wenn ja, dann die Range entsprechend einschräbnken, die an den aktuellen Knoten gesendet wird. (So, dass der nächste Knoten den Broadcast nicht mehr erhält)
+          //Wenn ja, dann die Range entsprechend einschränken, die an den aktuellen Knoten gesendet wird. 
+          //(So, dass der nächste Knoten den Broadcast nicht mehr erhält)
           if (successorID.isInInterval(nodeID, range))
-            subRange = successorID.add(-1); //-1, um den nachfolgenden Eintrag auszuschließen
+            subRange = successorID;
         }
 
         //Neue BroadcastInfo bauen und Broadcast an Knoten weiterleiten
