@@ -83,11 +83,13 @@ public class Game {
     }
     
     try {
+      IDInterval idRange = getNodeRange();
+      self = createSelfPlayer(idRange);
+      
+      //Crawler erst starten, nachdem der Spieler mit dem ID-Intervall erstellt wurde.
       if (USE_NODE_CRAWLER)
         new NodeCrawler(chord).start();
       
-      IDInterval idRange = getNodeRange();
-      self = createSelfPlayer(idRange);
       distributeShips(idRange);      
       setReady();
       

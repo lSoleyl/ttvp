@@ -26,23 +26,21 @@ public class NodeCrawler extends Thread {
   public void run() {
     log.info("starting crawler");
     Node localNode = chord.getLocalNode();
-    ID current = localNode.getNodeID();
-    ID predecessor = current;
+    ID predecessor = localNode.getNodeID();
+    ID current = predecessor.add(1);    
     
-    while(true) {
+    while(!Game.instance.self.known().getInterval().contains(current)) {
       try {
-        log.debug("calling findSuccessor(" + current.add(1) + ")");
-        Node remote = localNode.findSuccessor(current.add(1));
+        log.debug("calling findSuccessor(" + current + ")");
+        Node remote = localNode.findSuccessor(current);
         ID nodeID = remote.getNodeID();
         log.debug("findSucessor() returned new node with ID: " + nodeID);
        
-        if (nodeID.equals(localNode.getNodeID())) //Abbbruchbedingung, Ring vollständig durchlaufen
-          break;
         //Neuen Spieler hinzufügen/bekannten updaten
         Game.instance.addKnownPlayer(nodeID, new IDInterval(predecessor, nodeID));
         
         predecessor = nodeID;
-        current = nodeID;
+        current = nodeID.add(1);
       } catch (CommunicationException ex) { //lookup ist fehlgeschlagen
         log.info("Retrieving successor failed!");
         current = current.add(1); 
