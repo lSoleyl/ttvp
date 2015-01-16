@@ -459,15 +459,7 @@ public final class NodeImpl extends Node {
     //Broadcast an Anwendung weiterreichen und erst dann weiterleiten
     // falls andere Clients im Broadcast zurückschießen, bringt das so unsere History 
     // nicht durcheiannder
-		if (this.notifyCallback != null) {
-      String callSource = "127.0.0.1"; //Default ist localhost
-      try {      
-        callSource = RemoteServer.getClientHost();
-      } catch (ServerNotActiveException ex) {} //Wenn Exception kam, dann haben wir broadcast() selbst aufgerufen
-      
-      
-			this.notifyCallback.broadcast(info.getSource(), info.getTarget(), info.getHit(), info.getTransaction(), callSource);
-		}
+	  this.notifyCallback.broadcast(info.getSource(), info.getTarget(), info.getHit(), info.getTransaction());
     
     /*
       Die Range sagt aus, dass alle Knoten im Intervall [this.nodeID; range) 

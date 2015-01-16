@@ -35,8 +35,8 @@ public class CallbackHandler implements NotifyCallback {
   }
 
   @Override
-  public void broadcast(ID source, ID target, Boolean hit, int transactionID, String sourceHost) {
-    LOG.debug("NotifyCallback.broadcast(" + source + ", " + target + ", " + hit + ", " + transactionID + ", " + sourceHost + ")");
+  public void broadcast(ID source, ID target, Boolean hit, int transactionID) {
+    LOG.debug("NotifyCallback.broadcast(" + source + ", " + target + ", " + hit + ", " + transactionID + ")");
     //Hier nicht Game.waitReady(), da es nicht notwendig ist...
     Player dstPlayer = Game.instance.getPlayer(source);
     dstPlayer.setField(target, hit ? Field.SHIP : Field.NOTHING);
@@ -44,7 +44,7 @@ public class CallbackHandler implements NotifyCallback {
     //TODO erkennen, ob man gewonnen hat (man hat den Schuss für diesen Broadcast selbst abgegeben und der Spieler hat keine Schiffe mehr)
     //TODO wenn gewonnen, dann TargetSelection-Thread benachrichtigen und History ausgeben
     
-    Game.instance.history.addEntry(transactionID, source, target, hit, sourceHost);
+    Game.instance.history.addEntry(transactionID, source, target, hit);
   }
 
 }
