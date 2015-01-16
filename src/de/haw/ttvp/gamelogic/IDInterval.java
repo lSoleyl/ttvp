@@ -49,6 +49,27 @@ public class IDInterval {
     }
   }
   
+  /** Looks up the index to the given ID.
+   * 
+   * @param target the ID to get the index for
+   * 
+   * @return the index if inside the interval (0-SHIP_COUNT) or -1 if not found
+   */
+  public int getIntervalIndex(ID target) {
+    for(int c = 0; c+1 < ids.size(); ++c) {
+      ID intervalStart = ids.get(c).add(-1);
+      ID intervalEnd = ids.get(c+1);
+      
+      if (target.isInInterval(intervalStart, intervalEnd))
+        return c;
+    }
+    
+    if (target.isInInterval(ids.get(ids.size()-1).add(-1), to))
+      return ids.size()-1;
+    
+    return -1;
+  }
+  
   /** Looks up the given ID inside the intervallist and returns the ID which 
    *  identifies the interval itself.
    *
@@ -57,17 +78,9 @@ public class IDInterval {
    * @return the ID which identifies the interval(see 'ids'). Or null, if outside the interval
    */
   public ID getIntervalID(ID target) {
-    
-    for(int c = 0; c+1 < ids.size(); ++c) {
-      ID intervalStart = ids.get(c).add(-1);
-      ID intervalEnd = ids.get(c+1);
-      
-      if (target.isInInterval(intervalStart, intervalEnd))
-        return ids.get(c);
-    }
-    
-    if (target.isInInterval(ids.get(ids.size()-1).add(-1), to))
-      return ids.get(ids.size()-1);
+    int c = getIntervalIndex(target);
+    if (c != -1)
+      return ids.get(c);
     
     return null;
   }

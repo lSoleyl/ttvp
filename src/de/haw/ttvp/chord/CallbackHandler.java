@@ -41,10 +41,18 @@ public class CallbackHandler implements NotifyCallback {
     Player dstPlayer = Game.instance.getPlayer(source);
     dstPlayer.setField(target, hit ? Field.SHIP : Field.NOTHING);
     
-    //TODO erkennen, ob man gewonnen hat (man hat den Schuss für diesen Broadcast selbst abgegeben und der Spieler hat keine Schiffe mehr)
     //TODO wenn gewonnen, dann TargetSelection-Thread benachrichtigen und History ausgeben
     
     Game.instance.history.addEntry(transactionID, source, target, hit);
+    
+    
+    //TODO hier fehlt noch der test, ob man selbst den letzten Schuss abgegeben hat.
+    //TODO außerdem ist System.exit() falsch, denn der Broadcast sollte zuende laufen können
+    //TODO stattdessen müssen alle lokalen Threads über das Spielende benachrichtigt werden
+    if (dstPlayer != Game.instance.self && dstPlayer.shipsLost() == Game.SHIPS) {
+      Game.instance.history.print();
+      System.exit(123);
+    }
   }
 
 }

@@ -1,6 +1,7 @@
 package de.haw.ttvp.gamelogic;
 
 import de.haw.ttvp.Transaction;
+import de.haw.ttvp.gamelogic.player.Player;
 import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.util.logging.Logger;
 import java.util.LinkedList;
@@ -76,5 +77,29 @@ public class History {
     
     //Da entries nach transactionIds sortiert sind, liefert getLast() die höchste ID
     return entries.getLast().transactionID + 1;
+  }
+  
+  public void print() {
+    log.info("---------- History Content ------------");
+    String attacker = "???";
+    int lastID = -1;
+    
+    for(HistoryEntry e : entries) {
+      String hit = (e.hit) ? "X" : " ";
+      Player p = Game.instance.getPlayer(e.dstPlayer);
+      String slot = "ID:" + e.targetID;
+      if (p.isKnown())
+        slot = "Slot#" + p.known().getInterval().getIntervalIndex(e.targetID);
+      
+      if (lastID != e.transactionID - 1)
+        attacker = "???";
+      
+      log.info(String.format("%4d - %s  (%s) -> (%s)[%s]", e.transactionID, hit, 
+              attacker, e.dstPlayer, slot));
+      
+      lastID = e.transactionID;
+      attacker = e.dstPlayer.toString();
+    }
+    
   }
 }
