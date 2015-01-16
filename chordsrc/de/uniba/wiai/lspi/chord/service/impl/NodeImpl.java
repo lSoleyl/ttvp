@@ -479,7 +479,7 @@ public final class NodeImpl extends Node {
         Node receiver = fingerTable.get(c);
 
         ID subRange = range;
-        if (fingerTable.size() < c+1) { //gibt es einen nächsten Knoten in der Finger-Table?
+        if (fingerTable.size() > c+1) { //gibt es einen nächsten Knoten in der Finger-Table?
           ID successorID = fingerTable.get(c+1).getNodeID();
           //Prüfen, ob der nächste Eintrag der Finger-Table zwischen dem aktuellen Eintrag und Range liegt.
           //Wenn ja, dann die Range entsprechend einschränken, die an den aktuellen Knoten gesendet wird. 
@@ -490,6 +490,7 @@ public final class NodeImpl extends Node {
 
         //Neue BroadcastInfo bauen und Broadcast an Knoten weiterleiten
         Broadcast bInfo = new Broadcast(subRange, info.getSource(), info.getTarget(), info.getTransaction(), info.getHit());      
+        logger.debug("Sending broadcast to: " + receiver.getNodeID());
         logger.debug("Sending Broadcast: " + bInfo);
         receiver.broadcast(bInfo);
       }
