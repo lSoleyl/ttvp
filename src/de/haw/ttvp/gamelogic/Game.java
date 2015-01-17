@@ -6,12 +6,15 @@ import de.haw.ttvp.ui.Dialog;
 import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.service.Chord;
 import de.uniba.wiai.lspi.chord.service.impl.ChordImpl;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.log4j.Logger;
 
 
@@ -36,6 +39,11 @@ public class Game {
   private final Chord chord;
 
   private boolean reapplyHistory = false; //Wird vom Crawler auf true gesetzt, wenn er fertig ist
+  
+  private TargetSelection targetSelection;
+  
+  // Counter der versenkten Schiffe
+  private AtomicInteger lostShips = new AtomicInteger(0);
   
   public Game(Chord network) {
     this.chord = network;
@@ -76,10 +84,10 @@ public class Game {
     }
   }
   
-  public void start() {
+  public boolean start() {
     if (!Dialog.confirm("Start Game?", "User action")) {
       log.warn("Game start aborted.");
-      return;
+      return false;
     }
     
     try {
@@ -105,9 +113,20 @@ public class Game {
       }
       
       //Diesen Thread zur Zielwahl und zum Schießen nutzen.
-      new TargetSelection(makeTurn, chord).run();
+      targetSelection = new TargetSelection(makeTurn, chord);
+      targetSelection.run();
+      
+      // Ausgang des Spiels evaluieren
+      evaluateGame();
+      
+      // return successful
+      return true;
+      
     } catch (GameError e) {
       log.error("Game aborted!\n", e);
+      
+      // return unsucessful
+      return false;
     }
   }
   
@@ -226,7 +245,47 @@ public class Game {
   public Chord getChord() {
     return chord;
   }
+  
+  /**
+   * Suspend Game
+   * @param losingPlayer
+   */
+  public void suspend(boolean losingPlayer){
+	  log.info("Suspending TargetSelection from Game. losingPlayer="+losingPlayer);
+	  targetSelection.suspend();
+	  
+	  //TODO Workaround um Thread to beenden
+	  shoot();
+  }
+  
+  /**
+   * Increment lost Ships of this Player
+   */
+  public void addLostShip(){
+	 this.lostShips.getAndAdd(1);
+  }
+  
+  /**
+   * Get Count of lost Ships of this Player
+   * @return
+   */
+  public int getLostShips(){
+	  return this.lostShips.get();
+  }
+  
+  
+  /**
+   * Evaluate the Result of the Game
+   */
+  private void evaluateGame(){
+	  log.info("Evaluating Game-Success ...");
+	  
+	  //TODO Evaluate the Result of the Game
+	  this.history.print();
+  }
 }
+
+@SuppressWarnings("serial")
 class GameError extends Exception {
   public GameError(String message) {
     super(message);

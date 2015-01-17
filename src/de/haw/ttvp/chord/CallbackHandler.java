@@ -26,12 +26,24 @@ public class CallbackHandler implements NotifyCallback {
     boolean hit = false;
     if (self.hasShipAt(target)) {
       self.setField(target, Field.NOTHING); //Shiff als versenkt markieren
+      
+      // lostShips Counter inkrementieren
+      Game.instance.addLostShip();
       hit = true;
     }
     
     Game.instance.getChord().broadcast(target, hit); //Alle anderen Knoten benachrichtigen
-    Game.instance.shoot(); //Shoot kehrt sofort zurück und führt die Zielsuche 
-                           //und den Schuss von einem zweiten Thread durch. (Main-Thread)
+    
+    if(hit && Game.instance.getLostShips() == Game.SHIPS){
+		LOG.debug("Detected destruction of own last Ship");
+    	
+    	// Stop Game & trigger Evaluation of Game-Statistics
+    	Game.instance.suspend(true);
+    } else {
+    	Game.instance.shoot(); //Shoot kehrt sofort zurück und führt die Zielsuche 
+        //und den Schuss von einem zweiten Thread durch. (Main-Thread)
+    }
+    
   }
 
   @Override
@@ -50,8 +62,10 @@ public class CallbackHandler implements NotifyCallback {
     //TODO außerdem ist System.exit() falsch, denn der Broadcast sollte zuende laufen können
     //TODO stattdessen müssen alle lokalen Threads über das Spielende benachrichtigt werden
     if (dstPlayer != Game.instance.self && dstPlayer.shipsLost() == Game.SHIPS) {
-      Game.instance.history.print();
-      System.exit(123);
+    	LOG.debug("Detected destruction of last Ship of Player with ID: "+dstPlayer.getID().toHexString());
+    	
+    	// Stop Game & trigger Evaluation of Game-Statistics
+    	Game.instance.suspend(false);
     }
   }
 
