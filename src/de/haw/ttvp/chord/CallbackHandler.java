@@ -1,5 +1,6 @@
 package de.haw.ttvp.chord;
 
+import de.haw.ttvp.gamelogic.AsyncInvoke;
 import de.haw.ttvp.gamelogic.Field;
 import de.haw.ttvp.gamelogic.Game;
 import de.haw.ttvp.gamelogic.player.Player;
@@ -32,13 +33,13 @@ public class CallbackHandler implements NotifyCallback {
       hit = true;
     }
     
-    Game.instance.getChord().broadcast(target, hit); //Alle anderen Knoten benachrichtigen
+    AsyncInvoke.broadcast(target, hit); //Alle anderen Knoten benachrichtigen
     
     if(hit && Game.instance.getLostShips() == Game.SHIPS){
-		LOG.debug("Detected destruction of own last Ship");
+      LOG.debug("Detected destruction of own last Ship");
     	
-    	// Stop Game & trigger Evaluation of Game-Statistics
-    	Game.instance.suspend(true);
+      // Stop Game & trigger Evaluation of Game-Statistics
+      Game.instance.suspend(true);
     } else {
     	Game.instance.shoot(); //Shoot kehrt sofort zurück und führt die Zielsuche 
         //und den Schuss von einem zweiten Thread durch. (Main-Thread)

@@ -41,7 +41,7 @@ public class TargetSelection {
       log.info("Shooting at ID: " + target);
       try {
         log.debug("calling retrive(" + target + ")");
-        chord.retrieve(target);
+        AsyncInvoke.retrive(target);
         log.debug("retrive() returned");
       } catch (ServiceException e) {
         log.error("Retrieve on ID : " + target + " failed with error:\n", e);
