@@ -40,7 +40,6 @@ public class TargetSelection {
       final ID target = findTarget();
       log.info("Shooting at ID: " + target);
       log.debug("calling retrive(" + target + ")");
-      //AsyncInvoke.retrive(target);
       AsyncInvoke.invoke(() -> {
         try {
           chord.retrieve(target);
