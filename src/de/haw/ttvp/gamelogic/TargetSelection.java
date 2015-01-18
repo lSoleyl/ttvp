@@ -37,16 +37,18 @@ public class TargetSelection {
       }
 
       //Ziel wählen und Schuss abgeben
-      ID target = findTarget();
+      final ID target = findTarget();
       log.info("Shooting at ID: " + target);
-      try {
-        log.debug("calling retrive(" + target + ")");
-        AsyncInvoke.retrive(target);
-        log.debug("retrive() returned");
-      } catch (ServiceException e) {
-        log.error("Retrieve on ID : " + target + " failed with error:\n", e);
-        throw new GameError("TargetSelection can't proceed, retrieve() failed!");
-      }
+      log.debug("calling retrive(" + target + ")");
+      //AsyncInvoke.retrive(target);
+      AsyncInvoke.invoke(() -> {
+        try {
+          chord.retrieve(target);
+        } catch (ServiceException e) {
+          log.error("Retrieve on ID : " + target + " failed with error:\n", e);
+        }
+      });
+      log.debug("retrive() returned");
     }
     
     log.info("TargetSelection routine suspended...");

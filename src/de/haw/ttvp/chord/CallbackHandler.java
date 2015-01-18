@@ -24,16 +24,15 @@ public class CallbackHandler implements NotifyCallback {
     
     Player self = Game.instance.self;
     
-    boolean hit = false;
-    if (self.hasShipAt(target)) {
+    final boolean hit = self.hasShipAt(target);
+    if (hit) {
       self.setField(target, Field.NOTHING); //Shiff als versenkt markieren
       
       // lostShips Counter inkrementieren
       Game.instance.addLostShip();
-      hit = true;
     }
     
-    AsyncInvoke.broadcast(target, hit); //Alle anderen Knoten benachrichtigen
+    AsyncInvoke.invoke(() -> Game.instance.getChord().broadcast(target, hit));
     
     if(hit && Game.instance.getLostShips() == Game.SHIPS){
       LOG.debug("Detected destruction of own last Ship");
