@@ -17,7 +17,6 @@ public class WeakestKnownTarget extends Strategy {
   @Override
   public ID findTarget() {
      KnownPlayer player = selectWeakestKnownPlayer();
-     ID target = null;
      
      if (player != null) {
        log.info("Targeting player: " + player.getID());
