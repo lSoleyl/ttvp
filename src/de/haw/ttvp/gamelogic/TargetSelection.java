@@ -12,6 +12,7 @@ public class TargetSelection {
   private final Semaphore makeTurn;
   private final Chord chord;
   private boolean isRunning = true;
+  public final int SLEEP_BEFORE_SUSPEND = 1000; //ms
 
   public TargetSelection(Semaphore makeTurn, Chord chord) {
     this.makeTurn = makeTurn;
@@ -49,8 +50,11 @@ public class TargetSelection {
       });
       log.debug("retrive() returned");
     }
-    
     log.info("TargetSelection routine suspended...");
+    log.info("Sleeping for " + SLEEP_BEFORE_SUSPEND + "ms before exiting application");
+    try {
+      Thread.sleep(SLEEP_BEFORE_SUSPEND);
+    } catch (InterruptedException ex) {}
   }
   
   /**

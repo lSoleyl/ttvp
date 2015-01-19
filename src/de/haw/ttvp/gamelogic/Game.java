@@ -43,9 +43,6 @@ public class Game {
   
   private TargetSelection targetSelection;
   
-  // Counter der versenkten Schiffe
-  private AtomicInteger lostShips = new AtomicInteger(0);
-  
   public Game(Chord network) {
     this.chord = network;
     Game.instance = this;
