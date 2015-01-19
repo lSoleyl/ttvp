@@ -1,22 +1,23 @@
 package de.haw.ttvp.gamelogic;
 
-import de.haw.ttvp.gamelogic.History.HistoryEntry;
-import de.haw.ttvp.gamelogic.player.*;
-import de.haw.ttvp.ui.Dialog;
-import de.uniba.wiai.lspi.chord.data.ID;
-import de.uniba.wiai.lspi.chord.service.Chord;
-import de.uniba.wiai.lspi.chord.service.impl.ChordImpl;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
 
 import org.apache.log4j.Logger;
+
+import de.haw.ttvp.gamelogic.History.HistoryEntry;
+import de.haw.ttvp.gamelogic.player.KnownPlayer;
+import de.haw.ttvp.gamelogic.player.Player;
+import de.haw.ttvp.gamelogic.player.SelfPlayer;
+import de.haw.ttvp.gamelogic.player.UnknownPlayer;
+import de.haw.ttvp.ui.Dialog;
+import de.uniba.wiai.lspi.chord.data.ID;
+import de.uniba.wiai.lspi.chord.service.Chord;
+import de.uniba.wiai.lspi.chord.service.impl.ChordImpl;
 
 
 
