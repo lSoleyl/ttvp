@@ -74,12 +74,12 @@ public abstract class Player {
     return Game.instance.history.getDestructionCount(this);
   }
   
-  /** Returns the ratio of (remaining ships)/(hits received)
+  /** Returns the ratio of (lost ships)/(hits received)
    * 
    * @return the ships hit ratio
    */ 
   public double shipsHitsRatio() {
-    return (Game.SHIPS - shipsLost()) / ((double)hitCount());
+    return (shipsLost()) / ((double)hitCount());
   }
   
   /** Returns the ratio of (shots made)/(ships destroyed)
@@ -150,7 +150,7 @@ public abstract class Player {
       "[DEFENSE]\n" +
       "ships lost      : " + shipsLost + "\n" + 
       "was shot at     : " + hitCount() + " times\n" + 
-      "ships/hits      : " + shipsHitsRatio() + "\n" +
+      "losts/hits      : " + shipsHitsRatio() + "\n" +
       "[OFFENSE]\n" +
       "ships destroyed : " + destructionCount + "\n" + 
       "shots fired     : " + shotCount() + "\n" +

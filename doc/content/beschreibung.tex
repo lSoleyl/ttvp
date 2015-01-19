@@ -2,9 +2,57 @@
 % Einleitung
 %---------------------------------------------------------------------------------
 
-\section{Einleitung}
+\section{Lösungsansatz}
+Im folgenden ist beschrieben, welche Probleme bei der Implementierung des Spiels berücksichtigt werden mussten und wie wir damit umgegangen sind.\\
 
-Das Ziel in diesem Praktikum ist das Errichten eines Mesh Routing Netzes auf der Basis des B.A.T.M.A.N.- und OLSR-Protokolls. Bei den genannten Protokollen handelt es sich um unterschiedliche MANET-Protokolle, die analysiert und verglichen werden sollen. Um dabei eine Aussage über die Vor- und Nachteile des jeweiligen Protokolls treffen zu können, werden in jeder Laborgruppe jeweils zwei Mesh-Router verwendet und unter Absprache zwischen den Gruppen als Teil eines Mesh-Netzwerkes betrieben. Anhand von Netzwerkanalyse-Werkzeugen wird Datenverkehr aufgezeichnet und in Bezug auf das verwendete Protokoll untersucht.\\
+\subsection{Globale Historie}
+Um auf vollständige Informationen über den Spielverlauf zugreifen zu können, haben wir eine globale Historie implementiert, in der alle Informationen, die wir über \texttt{broadcast()}-Aufrufen erfahren haben, abgelegt werden. Über die Historie können wir prüfen, ob ein einkommender Broadcast ein Duplikat ist. Da wir die Einträge innerhalb der Historie immer nach der Reihenfolge der Transaktions-IDs ordnen, können wir so auch feststellen, ob wir Broadcast-Nachrichten verpasst haben und den Spieler zuordnen, der den Broadcast durch das \texttt{retrieve()} ausgelöst hat. Für den ersten Eintrag ist dies erst möglich, wenn wir das vollständige Intervall des anfangenden Spielers kennen. Aus der Historie können für alle Spieler Metriken abgeleitet werden, die für die Zielwahl interessant sind.\\
+
+Konkret sind dies die folgenden Metriken
+\begin{itemize}
+	\item Anzahl der Schiffe, die der Spieler verloren hat
+	\item Anzahl der Schüsse, die auf den Spieler abgegeben wurden
+	\item Anzahl der Schüsse, die der Spieler abgegeben hat
+	\item Anzahl der Schiffe, die der Spieler versenkt hat
+\end{itemize}
+
+Aus diesen Grundmetriken sind noch zusätzlich zwei Leistungsmetriken abgeleitet
+\begin{itemize}
+	\item $ rh = \frac{verlorene\:Schiffe}{Sch\ddot{u}sse\:in\:den\:eigenen\:Bereich} $
+	\item $ ds = \frac{zerst\ddot{o}rte\:Schiffe}{abgegebene\:Sch\ddot{u}sse} $
+\end{itemize}
+
+Erste dieser beiden Metriken beschreibt die Effektivität der Schiffsverteilung eines Spielers. Erwartungsgemäß sollte dieser Wert $ \frac{1}{10} $ entsprechen (bei 100 Slots und 10 Schiffen). Hat der Spieler einen deutlichen niedrigeren Wert, so hat er seine Schiffe besonders gut platziert und es wurden weniger Schiffe getroffen, als erwartet.\\
+
+Der zweite Wert beschreibt die Effektivität des Spielers bei der Zielwahl. Auf hier wäre der Erwartungswert bei zufälliger Zielwahl und Schiffsverteilung  $ \frac{1}{10} $. Hat der Spieler einen deutlich höheren Wert, so hat er eine besonders effektive Vorgehensweise, Schiffe zu finden und zu versenken.\\
+
+
+\subsection{Knotenerkennung}
+Eine große Herausforderung nach der Aufgabenstellung ist die korrekte Erkennung der Knotenintervalle bei unvollständiger Information zu Beginn des Spiels. Wir haben das Problem durch zwei Maßnahmen gelöst. Jeder Knoten, der durch einen Broadcast bekannt wird, wird vorerst als \texttt{UnknownPlayer} in unserer Spielerliste geführt. Alle Schüsse, die auf einen solchen unbekannten Spieler abgegeben wurden werden in dem Spieler selbst und in unserer globalen Historie abgelegt. Durch das unbekannte Intervall fehlt uns die Abbildung von \texttt{ID -> SlotNr}. Dadurch können wir nicht bestimmen, welche Slots noch nicht beschossen wurden. Aufgrund der Festlegung, dass jedes Schiff nur einmalig versenkt werden kann, können wir aber feststellen, wie viele Schiffe dieser Spieler noch besitzt und ob er bereits besiegt wurde. Da diese Information nicht ausreicht, um zuverlässig auf Ziele zu schießen, ohne dabei bereits beschossene Felder erneut zu treffen, werden die Spieler mit unbekannten Intervallen bei der Zielwahl ignoriert.\\
+
+Wenn wir das vollständige Intervall des Spielers kennen, wird der Spieler zu einem \texttt{KnownPlayer}, indem alle Informationen aus vergangenen Broadcasts (sind in unserer globalen Historie gespeichert) auf den Spieler übertragen werden und dabei die Abbildung von IDs auf Slots berücksichtigt wird. Von dem Moment an, wissen wir genau, auf welche Felder noch nicht geschossen wurde. Die Knotenerkennung lief bisher bei eigenen Messungen sehr schnell ab (< 1 Sekunde). Sind wir am Zug, dann warten wir dennoch auf die den Crawler, falls er noch nicht fertig sein sollte.\\
+
+Um die unbekannten Spielerintervalle so schnell, wie möglich aufzulösen, haben wir einen speziellen Thread geschrieben, den \texttt{NodeCrawler}. Dieser wird zu Beginn des Spiels gestartet, sobald der Chord-Ring aufgebaut ist. Seine Aufgabe ist es, alle Spielerintervalle im Ring zu finden. Das bewerkstelligt er, indem er bei der ID des eigenen Knoten beginnt, eins draufaddiert und mit \texttt{findSuccessor()} den zuständigen Knoten für die jeweilige ID findet. Anschließend wird der Vorgang mit dessen ID wiederholt, bis der Crawler bei wieder bei der ID des eigenen Knotens angekommen ist.
+
+
+\subsection{Threadingmodell}
+Die zur Verfügung gestellt Chord-Implementierung basiert auf RMI-Aufrufen. Wir erfahren über zwei Callback-Methoden, was im Spiel passiert.
+Da RMI-Aufrufe den aufrufenden Thread blockieren und die Anzahl der Ausführungsthreads begrenzt ist, haben wir uns dazu entschieden, die Zielwahl und das Schießen in einen seperaten Thread auszulagern, der über eine Semaphore benachrichtigt wird, dass er am Zug ist.\\
+
+Der NotifyCallback-Listener das \texttt{retrieve()} kehrt nach der Durchführung des Broadcasts sofort zurück. Dadurch verhindern wir, dass sich die \texttt{retrive()}- und \texttt{broadcast()}-Methoden immer weiter ineinander verschachteln, bis keine Invocation-Threads mehr übrig sind oder es zu einem Stack-Overflow kommt. Wir sind generell davon ausgegangen, dass es Client-Implementierungen gibt, die einfach die Anzahl der Invocation-Threads erhöhen, um dieses Problem zu umgehen, und in ihren Callback-Methoden den nächsten Zug durchführen. Für diesen Fall haben wir eine Konfigurationskonstante, die wir anpassen können, damit unser Zielwahl-Thread nicht dadurch behindert wird, dass andere Implementierungen im \texttt{retrieve()} blockieren. Setzen wir die Konstante \texttt{USE\_ASYNC\_CHORD\_CALLS}, dann wird jedes \texttt{retrive()} und jedes \texttt{broadcast()} in einem eigenen Thread ausgeführt.\\
+
+
+\subsection{Broadcast-Implementierung}
+Bei der Broadcast-Implementierung haben wir zusätzlich zu dem Fingertable-Broadcast einen einfachen Broadcast implementiert, der die Broadcast-Information nur an den direkten Nachfolgerknoten gibt, ohne dabei die Range anzupassen. Sollte es Probleme mit der der (komplizierteren) Broadcast-Implementierung geben, so können wir mit einer Konfigurationskonstante die einfache Implementierung nutzen.\\
+
+Des weiteren haben wir den Broadcast so abgeändert, dass zuerst unser Callback aufgerufen wird, und erst im Anschluss darauf alle anderen Knoten benachrichtigt werden. Somit verhindern wir, dass wenn andere Knoten in ihrem Broadcast-Callback auf den Broadcast reagieren und bereits \texttt{retrive()} aufrufen, wir den Broadcast nicht mitbekommen. Da wir in unserem Broadcast nie blockieren, besteht keine Gefahr, dass wir durch diese Implementierung einen gestarteten Broadcast fälschlicher Weise unterbrechen.\\
+
+\subsection{Spielende}
+Das Spielende erkennen wir anhand der Historie. In jedem Broadcast prüfen wir, ob der zuletzt beschossene Spieler noch Schiffe besitzt. Sollte er keine Schiffe mehr besitzen, so schreiben wir diesen Spieler als Verlierer und den schießenden Knoten als Sieger in der Historie fest. Anschließend nimmt die Historie keine neuen Einträge mehr entgegen. Der Zielwahl-Thread wird über das Spielende benachrichtigt und gibt alle aus der Historie bekannten Informationen über die Spieler und den Spielverlauf aus und beendet sich und die Anwendung nach einer bestimmten Zeitspanne. Diese Zeitspanne soll sicherstellen, dass der letzte Broadcast den Chord-Ring korrekt durchlaufen kann, ehe der Ring heruntergefahren wird. 
+
+
+
+
 
 
 
