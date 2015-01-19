@@ -138,6 +138,21 @@ public class Game {
     makeTurn.release();
   }
   
+  /** Returns the player which started the game (if known)
+   * 
+   * @return the player which started the game
+   */
+  public Player getInitialPlayer() {
+    if (self.isInitialPlayer())
+      return self;
+    
+    for (Player p : playerMap.values())
+      if (p.isInitialPlayer())
+        return p;
+    
+    return null;
+  }
+  
   private void printRange(IDInterval range) {    
     log.debug(" ID-Range ");
     log.debug(" from: " + range.from.toHexString());

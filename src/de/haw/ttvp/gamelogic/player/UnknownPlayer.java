@@ -7,6 +7,7 @@ package de.haw.ttvp.gamelogic.player;
 
 import de.haw.ttvp.gamelogic.Field;
 import de.haw.ttvp.gamelogic.Game;
+import de.haw.ttvp.gamelogic.History;
 import de.haw.ttvp.gamelogic.IDInterval;
 import de.uniba.wiai.lspi.chord.data.ID;
 import java.util.Map.Entry;
@@ -66,13 +67,18 @@ public class UnknownPlayer extends Player {
   
   @Override
   public String summary(boolean verbose) {
-    int hitCount = Game.instance.history.getHitCount(this);
+    History history = Game.instance.history;
+    int hitCount = history.getHitCount(this);
+    int destructionCount = history.getDestructionCount(this);
     
     return "-Unknown Player-\n" + 
       super.summary(verbose) + "\n" + 
-      "ships lost  : " + shipsLost() + "\n" + 
-      "was shot at : " + hitCount + " times\n" + 
-      "ships/hits  : " + ((double)shipsLost() / hitCount) + "\n";
-      
+      "[DEFENSE]\n" +
+      "ships lost      : " + shipsLost() + "\n" + 
+      "was shot at     : " + hitCount + " times\n" + 
+      "ships/hits      : " + ((double)shipsLost() / hitCount) + "\n" +
+      "[OFFENSE]\n" +
+      "ships destroyed : " + destructionCount;
+      //TODO print other info (shots total, shot/hit ratio)
   }
 }

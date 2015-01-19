@@ -90,7 +90,8 @@ public class History {
   
   public void print() {
     log.info("---------- History Content ------------");
-    String attacker = "???";
+    Player starter = Game.instance.getInitialPlayer();
+    String attacker = (starter != null) ? starter.getID().toString() : "???";
     int lastID = -1;
     
     for(HistoryEntry e : entries) {
@@ -129,18 +130,36 @@ public class History {
   /** Returns the amount of entries in which the player has been shot at.
    * 
    * @param player the player to get the info of
-   * @return 
+   * 
+   * @return the amount of ships, this player has lost
    */
   public int getHitCount(Player player) {
     ID nodeID = player.getID();
     return (int)entries.stream().filter((entry) -> entry.dstPlayer.equals(nodeID)).count();
   }
   
+  /** Returns the amout of ships the given player has destroyed.
+   * 
+   * @param player the player whose information should be queried
+   * 
+   * @return the amount of ships the player has destroyed
+   */
   public int getDestructionCount(Player player) {
     ID nodeID = player.getID();
     int destructions = 0;
     
-    //TODO 
+    Player starter = Game.instance.getInitialPlayer();
+    ID lastAttacker = (starter != null) ? starter.getID() : null;
+    int lastTid = -1;
+    
+    for (HistoryEntry entry : entries) {
+      if (entry.transactionID == lastTid + 1)  //Angreifer bekannt
+        if (entry.hit && lastAttacker != null && lastAttacker.equals(nodeID)) //Ziel getroffen und korrekter Angreifer
+          ++destructions;
+      
+      lastTid = entry.transactionID;
+      lastAttacker = entry.dstPlayer;
+    }
     
     return destructions;
   }
