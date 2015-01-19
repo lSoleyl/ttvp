@@ -4,3 +4,36 @@
 
 \section{Beschreibung der Strategie}
 
+Sobald die erfolgreiche Teilnahme an einem verteilten Spiel vorausgesetzt werden kann, ist eine ausgereifte Strategie zum Gewinnen notwendig.\\ Die hier entwickelte Strategie unterscheidet dabei grundlegend die folgenen Fälle:
+
+\begin{itemize}
+\item \textit{Aktiver Modus}: Der Spieler greift aggresiv die möglichst besten Ziele an und nimmt dabei in Kauf, eigene Schiffe zu verlieren. Das Ziel ist es, das Spiel zu gewinnen.
+\item \textit{Passiver Modus}: Der Spieler besitzt nur noch wenige Schiffe und versucht möglichst keine weiteren Schiffe zu verlieren. Das übergeordnete Ziel ist hier, das Spiel nicht zu verlieren.
+\end{itemize}
+
+Der passende Modus wird dabei von der Spielelogik vor jedem Schuss neu evaluiert und darauf hin die Auswahl des nächsten Ziels abgestimmt. Dabei wird jeweils im ersten Schritt der Spieler ausgewählt, der beschossen werden soll. Im Anschluss wird aus dem von dem jeweiligen Spieler verwalteten Intervall ein geeignetes Feld und die dazugehörige Chord-ID ermittelt. Zu diesem Zweck werden in der Spielelogik Metriken zu den teilnehmenden Spieler ermittelt und im Verlauf des Spiels erweitert. Im Folgeden werden die verwendeten Methoden zur Bestimmung des besten Ziels der jeweiligen Modi im Detail betrachtet.\\
+
+\subsection{Bestimung des Ziel-Spielers im aktiven Modus}
+
+Im aktiven Modus wird versucht, das bestmögliche Ziel zum Gewinnen des Spiels zu bestimmen. Dazu wird zunächst geprüft, ob ein Spieler existiert, welcher lediglich ein verbleibendes Schiff besitzt. Ein solcher Spieler kann im Besten Fall nach nur einem weiteren Treffer besiegt werden. \\
+Existiert derzeit kein geeigneter Spieler, welcher nur noch ein verbleibendes Schiff besitzt, wird nach Spielern gesucht, die im Verlauf des Spiels immer auf die jeweiligen Angreifer zurück geschossen haben, welche sie als letztes angegriffen haben. Sobald ein solcher Spieler gefunden ist, kann geprüft werden, ob dieser Spieler schwächer ist, als der eigene Spieler. Vermutlich wird ein dieser Spieler dann direkt zurück schießen und kann so nach einer Reihe von Zügen besiegt werden, ohne dass sich andere Spieler ins Spielgeschehen einmischen können. Damit ist ein sicherer Sieg des eigenen Spielers möglich.\\
+Wenn die beiden vorangehenden Methoden kein geeignetes Ziel ergeben, wird nach einem inaktiven Spieler als Ziel gesucht. Auf diese Weise wird das Spiel dynamischer und es finden sich möglicherweise in einem der folgenden Züge ein Ziel, welches zu den vorangehenden Methodiken passt. Die Bestimmung des innaktivsten Spielers erfolgt dabei durch einen Beschuss-Zähler, welchen die Spielelogik für jeden teilnehmenden Spieler führt. Der Spieler, welcher am wenigsten beschossen wurde ist durch das Reglement des Spiels auch automatisch der Spieler, welcher am wenigsten Schüsse durchgeführt hat.\\
+Falls sich keine passenden Ziele finden lassen, wird ein zufälliger Spieler ausgewählt.\\
+
+\subsection{Bestimmung des Ziel-Spielers im passiven Modus}
+
+Sobald erkannt wird, dass der eigene Spieler der derzeit schwächste Teilnehmer bezüglich der verbleibenden Schiffe und beschossenen Felder im Spiel ist, wechselt die Spielelogik in den passiven Modus in dem der weitere Verlust von Schiffe vermieden werden soll.\\
+Dazu wird ein Spieler als Ziel ausgewählt, welcher den eigenen Spieler möglichst nicht kennt. Für diese Überlegung wird die \textit{FingerTable} von Chord herangezogen, die über \texttt{LOG(N)} Ring-IDs Referenzen auf die zugehörigen Knoten enthällt. Geht man nun davon aus, dass andere Spieler ausschließlich die \textit{FingerTable} der Chord-Implementierung zur Bestimmung von anderen Spieler verwenden, so kann ein Spieler gewählt werden, der den eigenen Spieler über diesen Weg nicht finden kann. Die Einträge in der \textit{FingerTable} sind nach der Funktion \( n+2^{i}\). Damit wird es umso wahrscheinlicher, dass keine Referenz auf den eigenen Spieler vorhanden ist, je weiter der eigene Spieler von dem Ziel in dessen logischem Ring entfernt ist. Somit wird der \textit{Successor} des eigenen Spieler als Ziel gewählt, das den eigenen Spieler wahrscheinlich nicht kennt.\\
+Ein weiterer Ansatz ist hier, dass ein Spieler als Ziel ausgewählt wird, der im vergangenen Verlauf des Spieles nie auf den eigenen Spieler gefeuert hat. Dies kann über die Aufzeichnung des Spielverlaufes durch die Spielelogik überprüft werden. Ein solcher Spieler feuert mögicherweise dann nicht auf den eigenen Spieler zurück.\\
+
+\subsection{Auswahl des Feldes}
+
+Ist ein geeigneter Spieler als Ziel bestimmt, gilt es auf ein Feld des Spielers zu schießen, welches Erfolg verspricht. Zu diesem Zweck verwendet die Spielelogik Methoden zur Erkennung verschiedener Muster, welche auf mögliche Ziele hindeuten können. Die implementierten Muster belaufen sich auf die folgenden Verteilungen:\\
+
+\begin{itemize}
+\item Ein oder mehrere Cluster aus einer beliebigen Anzahl an Schiffen
+\item gleichmäßige Verteilung der Schiffe über das Intervall
+\end{itemize}
+
+Zur Mustererkennung werden die durch die Spielelogik aufbereiteten Informationen über die teilnehmenden Spieler ausgewährtet. So wird etwa untersucht, an welchen Stellen bereits Schiffe getroffen wurden, oder welche Felder als leer identifiziert wurden. Wird ein Muster erfolgreich erkannt, werden dem Spiel mögliche Felder des bestimmten Spielers als Ziele zur Verfügung gestellt. Sobald sich keine Muster in der Verteilung der Schiffe des ausgewählten Spielers ermitteln lassen, wird aus den verbleibenden unbekannten Feldern des Spielers ein zufälliges Feld ausgewählt.\\
+
