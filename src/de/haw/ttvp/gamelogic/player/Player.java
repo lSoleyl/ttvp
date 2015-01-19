@@ -45,7 +45,7 @@ public abstract class Player {
     return lostShips;
   }
   
-  /** Returns the number of how often other player have shot into this player's range
+  /** Returns the number of how often other players have shot into this player's range
    * 
    * @return hit count
    */

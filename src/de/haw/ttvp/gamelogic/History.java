@@ -4,8 +4,10 @@ import de.haw.ttvp.Transaction;
 import de.haw.ttvp.gamelogic.player.Player;
 import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.util.logging.Logger;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class History {
   private static final Logger log = Logger.getLogger(History.class);
@@ -124,6 +126,12 @@ public class History {
       if (entries.get(c).transactionID == transactionID - 1)
         return entries.get(c).dstPlayer;
     
+    if (transactionID == 0) {
+      Player starter = Game.instance.getInitialPlayer();
+      if (starter != null)
+        return starter.getID();
+    }
+      
     return null;
   }
   
@@ -136,6 +144,25 @@ public class History {
   public int getHitCount(Player player) {
     ID nodeID = player.getID();
     return (int)entries.stream().filter((entry) -> entry.dstPlayer.equals(nodeID)).count();
+  }
+  
+  /** Returns a set of node ids of players, which attacked the given player
+   * 
+   * @param player the player whose attacker should be retrieved
+   * 
+   * @return the set containing all players, who attacked the given player
+   */
+  public Set<ID> getAttackers(ID player) {
+    Set<ID> attackers = new HashSet<>();
+    for (HistoryEntry entry : entries) {
+      if (entry.dstPlayer.equals(player)) {
+        ID attacker = getAttacker(entry.transactionID);
+        if (attacker != null)
+          attackers.add(attacker);
+      }
+    }
+    
+    return attackers;
   }
   
   /** Returns the amout of ships the given player has destroyed.
