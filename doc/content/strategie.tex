@@ -7,11 +7,11 @@
 Sobald die erfolgreiche Teilnahme an einem verteilten Spiel vorausgesetzt werden kann, ist eine ausgereifte Strategie zum Gewinnen notwendig.\\ Die hier entwickelte Strategie unterscheidet dabei grundlegend die folgenen Fälle:
 
 \begin{itemize}
-\item \textit{Aktiver Modus}: Der Spieler greift aggresiv die möglichst besten Ziele an und nimmt dabei in Kauf, eigene Schiffe zu verlieren. Das Ziel ist es, das Spiel zu gewinnen.
-\item \textit{Passiver Modus}: Der Spieler besitzt nur noch wenige Schiffe und versucht möglichst keine weiteren Schiffe zu verlieren. Das übergeordnete Ziel ist hier, das Spiel nicht zu verlieren.
+\item \textit{Aktiver Modus}: Der Spieler greift aggressiv die möglichst besten Ziele an und nimmt dabei in Kauf, eigene Schiffe zu verlieren. Das Ziel ist es, das Spiel zu gewinnen.
+\item \textit{Passiver Modus}: Der Spieler besitzt nur noch wenige Schiffe und versucht, möglichst keine weiteren Schiffe zu verlieren. Das übergeordnete Ziel ist hier, das Spiel nicht zu verlieren.
 \end{itemize}
 
-Der passende Modus wird dabei von der Spielelogik vor jedem Schuss neu evaluiert und darauf hin die Auswahl des nächsten Ziels abgestimmt. Dabei wird jeweils im ersten Schritt der Spieler ausgewählt, der beschossen werden soll. Im Anschluss wird aus dem von dem jeweiligen Spieler verwalteten Intervall ein geeignetes Feld und die dazugehörige Chord-ID ermittelt. Zu diesem Zweck werden in der Spielelogik Metriken zu den teilnehmenden Spieler ermittelt und im Verlauf des Spiels erweitert. Im Folgeden werden die verwendeten Methoden zur Bestimmung des besten Ziels der jeweiligen Modi im Detail betrachtet.\\
+Der passende Modus wird dabei von der Spielelogik vor jedem Schuss erneut evaluiert und darauf hin die Auswahl des nächsten Ziels abgestimmt. Dabei wird jeweils im ersten Schritt der Spieler ausgewählt, der beschossen werden soll. Im Anschluss wird aus dem von dem jeweiligen Spieler verwalteten Intervall ein geeignetes Feld und die dazugehörige Chord-ID ermittelt. Zu diesem Zweck werden in der Spielelogik Metriken zu den teilnehmenden Spieler ermittelt und im Verlauf des Spiels erweitert. Im Folgeden werden die verwendeten Methoden zur Bestimmung des besten Ziels der jeweiligen Modi im Detail betrachtet.\\
 
 \subsection{Bestimung des Ziel-Spielers im aktiven Modus}
 
