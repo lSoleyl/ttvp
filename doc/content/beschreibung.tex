@@ -3,7 +3,7 @@
 %---------------------------------------------------------------------------------
 
 \section{Lösungsansatz}
-Im folgenden ist beschrieben, welche Probleme bei der Implementierung des Spiels berücksichtigt werden mussten und wie wir damit umgegangen sind.\\
+Im Folgenden ist beschrieben, welche Probleme bei der Implementierung des Spiels berücksichtigt werden mussten und wie wir damit umgegangen sind.\\
 
 \subsection{Globale Historie}
 Um auf vollständige Informationen über den Spielverlauf zugreifen zu können, haben wir eine globale Historie implementiert, in der alle Informationen, die wir über \texttt{broadcast()}-Aufrufen erfahren haben, abgelegt werden. Über die Historie können wir prüfen, ob ein einkommender Broadcast ein Duplikat ist. Da wir die Einträge innerhalb der Historie immer nach der Reihenfolge der Transaktions-IDs ordnen, können wir so auch feststellen, ob wir Broadcast-Nachrichten verpasst haben und den Spieler zuordnen, der den Broadcast durch das \texttt{retrieve()} ausgelöst hat. Für den ersten Eintrag ist dies erst möglich, wenn wir das vollständige Intervall des anfangenden Spielers kennen. Aus der Historie können für alle Spieler Metriken abgeleitet werden, die für die Zielwahl interessant sind.\\
