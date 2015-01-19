@@ -14,6 +14,7 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
 
 import org.apache.log4j.Logger;
 
@@ -27,6 +28,7 @@ public class Game {
   public static final int TURN_DELAY_MS = 100;
   public static final boolean USE_SIMPLE_BROADCAST = false; //Nur über den Successor broadcasten
   public static final boolean USE_ASYNC_CHORD_CALLS = false; //Wenn true, dann wird jedes retrive() broadcast() in einem Thread gestartet
+  public static final int DELAY_BEFORE_SUSPEND = 1000; //ms
   
   private static final Logger log = Logger.getLogger(Game.class);
   private boolean ready = false;
@@ -168,10 +170,10 @@ public class Game {
       log.info("Distributing ships");
       List<Integer> shipPositions = selectShipPositions();
       
-      for(Integer shipIndex: shipPositions) { //Shiffe setzen
-        ID shipID = interval.ids.get(shipIndex);
-        self.setField(shipID, Field.SHIP);
-      }
+      shipPositions.stream().map((shipIndex) -> interval.ids.get(shipIndex)).
+              forEach((shipID) -> self.setField(shipID, Field.SHIP));
+      
+      log.info("Our ships are located at: " + shipPositions);
     }
   }
   
@@ -241,10 +243,9 @@ public class Game {
   
   /**
    * Suspend Game
-   * @param losingPlayer
    */
-  public void suspend(boolean losingPlayer){
-	  log.info("Suspending TargetSelection from Game. losingPlayer="+losingPlayer);
+  public void suspend(){
+	  log.info("Suspending TargetSelection from Game.");
 	  targetSelection.suspend();
   }
   
@@ -254,8 +255,18 @@ public class Game {
   private void evaluateGame(){
 	  log.info("Evaluating Game-Success ...");
 	  
-	  //TODO Evaluate the Result of the Game
 	  this.history.print();
+    
+    if (self.shipsLost() == SHIPS) // Wir haben verloren
+      log.info("We lost the game! All our ships have been destroyed");
+    else
+      log.info("" + history.getLoser() + " has lost all ships");
+    log.info("" + history.getWinner() + " has won");
+    
+    log.debug("Sleeping for " + DELAY_BEFORE_SUSPEND + "ms before exiting application");
+    try {
+      Thread.sleep(DELAY_BEFORE_SUSPEND);
+    } catch (InterruptedException ex) {}
   }
 }
 

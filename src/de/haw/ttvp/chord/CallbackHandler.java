@@ -28,7 +28,9 @@ public class CallbackHandler implements NotifyCallback {
     if (hit)
       self.setField(target, Field.NOTHING); //Shiff als versenkt markieren
     
+    LOG.debug("calling broadcast(" + target + ", "  + hit + ")");
     AsyncInvoke.invoke(() -> Game.instance.getChord().broadcast(target, hit));
+    LOG.debug("broadcast() returned");
     
     Game.instance.shoot(); //Shoot kehrt sofort zurück und führt die Zielsuche 
         //und den Schuss von einem zweiten Thread durch. (Main-Thread)    
@@ -41,13 +43,16 @@ public class CallbackHandler implements NotifyCallback {
     Player dstPlayer = Game.instance.getPlayer(source);
     dstPlayer.setField(target, hit ? Field.SHIP : Field.NOTHING);
     
-    Game.instance.history.addEntry(transactionID, source, target, hit);
+    if (dstPlayer.shipsLost() == Game.SHIPS) 
+      Game.instance.history.finalize(transactionID, source, target, hit);
+    else 
+      Game.instance.history.addEntry(transactionID, source, target, hit);
     
     if (dstPlayer.shipsLost() == Game.SHIPS) {
     	LOG.debug("Detected destruction of last Ship of Player with ID: "+dstPlayer.getID().toHexString());
     	
     	// Stop Game & trigger Evaluation of Game-Statistics
-    	Game.instance.suspend(false);
+    	Game.instance.suspend();
     }
   }
 

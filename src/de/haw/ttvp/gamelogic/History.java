@@ -11,6 +11,10 @@ public class History {
   private static final Logger log = Logger.getLogger(History.class);
   
 	private LinkedList<HistoryEntry> entries;
+  
+  private ID loserNode;
+  private ID winnerNode;
+  private boolean gameOver = false;
 	
 	public History(){
 		this.entries = new LinkedList<>(); //Linked list performanter beim Einfügen.
@@ -37,6 +41,11 @@ public class History {
   }
 	
 	public void addEntry(HistoryEntry entry){
+    if (gameOver) {
+      log.warn("Trying to insert entry into History, after game has finished!");
+      return;
+    }
+    
     if (entries.isEmpty() || Transaction.validIDFrom(entries.getLast().transactionID, entry.transactionID)) {
       entries.add(entry);
       return;
@@ -101,5 +110,37 @@ public class History {
       attacker = e.dstPlayer.toString();
     }
     
+  }
+  
+  /** Returns the NodeID of the attacker for the corresponding transaction ID
+   * 
+   * @param transactionID the entry-id for which the attacker should be retrived
+   *  
+   * @return the ID of the attacker, or null, if he isn't known due to a missing entry
+   */
+  public ID getAttacker(int transactionID) {
+    for (int c = entries.size() - 1; c >= 0; --c) 
+      if (entries.get(c).transactionID == transactionID - 1)
+        return entries.get(c).dstPlayer;
+    
+    return null;
+  }
+  
+  /** Make the history read only and enter the winner and loser
+   */
+  public void finalize(int transactionID, ID source, ID target, Boolean hit) {
+    addEntry(transactionID, target, target, true);
+    gameOver = true;
+    
+    loserNode = source;
+    winnerNode = getAttacker(transactionID);
+  }
+  
+  public ID getWinner() {
+    return winnerNode;
+  }
+  
+  public ID getLoser() {
+    return loserNode;
   }
 }
