@@ -126,6 +126,25 @@ public class History {
     return null;
   }
   
+  /** Returns the amount of entries in which the player has been shot at.
+   * 
+   * @param player the player to get the info of
+   * @return 
+   */
+  public int getHitCount(Player player) {
+    ID nodeID = player.getID();
+    return (int)entries.stream().filter((entry) -> entry.dstPlayer.equals(nodeID)).count();
+  }
+  
+  public int getDestructionCount(Player player) {
+    ID nodeID = player.getID();
+    int destructions = 0;
+    
+    //TODO 
+    
+    return destructions;
+  }
+  
   /** Make the history read only and enter the winner and loser
    */
   public void finalize(int transactionID, ID source, ID target, Boolean hit) {

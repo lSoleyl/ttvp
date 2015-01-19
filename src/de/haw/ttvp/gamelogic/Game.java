@@ -36,7 +36,7 @@ public class Game {
   private final Semaphore makeTurn = new Semaphore(0);
   
   public final Map<ID, Player> playerMap = new ConcurrentHashMap<>(); //Wird von dem Crawler-Thread mitbeschrieben
-  public Player self;
+  public SelfPlayer self;
   public final History history = new History();
   
   private final Chord chord;
@@ -100,8 +100,9 @@ public class Game {
       
       distributeShips(idRange);      
       setReady();
+      printRange(idRange);      
       
-      if (isBeginningPlayer(idRange)) {
+      if (self.isInitialPlayer()) {
         log.info("I am starting the Game in 3 seconds...");
         try {
           Thread.sleep(3000);
@@ -137,13 +138,11 @@ public class Game {
     makeTurn.release();
   }
   
-  private boolean isBeginningPlayer(IDInterval range) {    
+  private void printRange(IDInterval range) {    
     log.debug(" ID-Range ");
     log.debug(" from: " + range.from.toHexString());
     log.debug("   to: " + range.to.toHexString());
     log.debug("maxID: " + ID.MAX_ID);
-    
-    return range.getIntervalID(ID.MAX_ID) != null;      
   }
   
   private IDInterval getNodeRange() throws GameError {
@@ -177,7 +176,7 @@ public class Game {
     }
   }
   
-  private Player createSelfPlayer(IDInterval idrange) {
+  private SelfPlayer createSelfPlayer(IDInterval idrange) {
     ChordImpl cImpl = (ChordImpl) chord;
     return new SelfPlayer(cImpl.getLocalNode().getNodeID(), idrange);
   }
@@ -262,6 +261,11 @@ public class Game {
     else
       log.info("" + history.getLoser() + " has lost all ships");
     log.info("" + history.getWinner() + " has won");
+    
+    log.info("---- Player Information ----");
+    
+    
+    
     
     log.debug("Sleeping for " + DELAY_BEFORE_SUSPEND + "ms before exiting application");
     try {

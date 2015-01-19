@@ -77,4 +77,9 @@ public class KnownPlayer extends Player {
   public IDInterval getInterval() {
     return interval;
   }
+  
+  @Override
+  public boolean isInitialPlayer() {
+    return interval.getIntervalID(ID.MAX_ID) != null;
+  }
 }

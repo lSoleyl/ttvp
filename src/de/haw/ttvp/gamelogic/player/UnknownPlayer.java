@@ -6,6 +6,7 @@
 package de.haw.ttvp.gamelogic.player;
 
 import de.haw.ttvp.gamelogic.Field;
+import de.haw.ttvp.gamelogic.Game;
 import de.haw.ttvp.gamelogic.IDInterval;
 import de.uniba.wiai.lspi.chord.data.ID;
 import java.util.Map.Entry;
@@ -56,9 +57,22 @@ public class UnknownPlayer extends Player {
     Player knownPlayer = new KnownPlayer(nodeID, range);
     
     //Bekannte Informationen auf neuen Spieler übertragen
-    for(Entry<ID, Field> info: fieldMap.entrySet())
+    fieldMap.entrySet().stream().forEach((info) -> {
       knownPlayer.setField(info.getKey(), info.getValue());
+    });
     
     return knownPlayer;
+  }
+  
+  @Override
+  public String summary(boolean verbose) {
+    int hitCount = Game.instance.history.getHitCount(this);
+    
+    return "-Unknown Player-\n" + 
+      super.summary(verbose) + "\n" + 
+      "ships lost  : " + shipsLost() + "\n" + 
+      "was shot at : " + hitCount + " times\n" + 
+      "ships/hits  : " + ((double)shipsLost() / hitCount) + "\n";
+      
   }
 }

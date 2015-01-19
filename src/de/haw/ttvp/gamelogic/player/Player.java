@@ -6,6 +6,7 @@
 package de.haw.ttvp.gamelogic.player;
 
 import de.haw.ttvp.gamelogic.Field;
+import de.haw.ttvp.gamelogic.Game;
 import de.haw.ttvp.gamelogic.IDInterval;
 import de.uniba.wiai.lspi.chord.data.ID;
 import java.util.HashMap;
@@ -84,5 +85,19 @@ public abstract class Player {
   
   public Map<ID, Field> getFieldMap() {
     return fieldMap;
+  }
+  
+  /** Returns a string representation of the currently known data of the player
+   * 
+   * @param verbose output more information
+   * 
+   * @return a string representation of the player
+   */
+  public String summary(boolean verbose) {
+    return "Node at: " + nodeID;
+  }
+  
+  public boolean isInitialPlayer() {
+    return false;
   }
 }

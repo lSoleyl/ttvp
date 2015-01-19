@@ -125,7 +125,7 @@ public class Main {
 			//TODO cleanup?
 			chord.leave();
 		} catch (Exception e){
-			LOG.error("Chord ERROR occured while disconnecting from Network via Chord.leave()", e);
+			LOG.debug("Chord ERROR occured while disconnecting from Network via Chord.leave()", e);
 		}
 		
 		// finally return Game success
