@@ -45,6 +45,51 @@ public abstract class Player {
     return lostShips;
   }
   
+  /** Returns the number of how often other player have shot into this player's range
+   * 
+   * @return hit count
+   */
+  public int hitCount() {
+    return Game.instance.history.getHitCount(this);
+  }
+  
+  /** The amount of shots the player has made
+   * 
+   * @return shot count
+   */
+  public int shotCount() {
+    int shots = (isInitialPlayer()) ? 1 : 0; //Als erster Spieler hat man einen Schuss mehr
+    if (nodeID.equals(Game.instance.history.getLoser())) //Als letzter Spieler hat man einen Schuss weniger
+      --shots;
+    
+    shots += hitCount();
+    return shots;
+  }
+  
+  /** Returns the number of ships this player has destroyed
+   * 
+   * @return the number of ships this node has destroyed
+   */
+  public int destructionCount() {
+    return Game.instance.history.getDestructionCount(this);
+  }
+  
+  /** Returns the ratio of (remaining ships)/(hits received)
+   * 
+   * @return the ships hit ratio
+   */ 
+  public double shipsHitsRatio() {
+    return (Game.SHIPS - shipsLost()) / ((double)hitCount());
+  }
+  
+  /** Returns the ratio of (shots made)/(ships destroyed)
+   * 
+   * @return the shots destruction ratio
+   */
+  public double shotsDestructsRatio() {
+    return shotCount() / ((double) destructionCount());
+  }
+  
   /** Set type of a field. If the given ID doesn't belong to this player
    *  nothing happens.
    * 
