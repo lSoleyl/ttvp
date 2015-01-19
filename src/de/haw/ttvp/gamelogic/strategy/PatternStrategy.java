@@ -202,6 +202,7 @@ public class PatternStrategy extends Strategy {
 				}
 			}
 			
+			// Select target from Collection of remaining possible Targets
 			if(possibleTargets.size()>0){
 				targetPlayer = possibleTargets.iterator().next();
 			} else {
