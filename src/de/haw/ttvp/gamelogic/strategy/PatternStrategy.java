@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
+import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
 
@@ -16,7 +16,9 @@ import de.haw.ttvp.gamelogic.Game;
 import de.haw.ttvp.gamelogic.History.HistoryEntry;
 import de.haw.ttvp.gamelogic.player.KnownPlayer;
 import de.haw.ttvp.gamelogic.player.Player;
+import de.uniba.wiai.lspi.chord.com.CommunicationException;
 import de.uniba.wiai.lspi.chord.data.ID;
+import de.uniba.wiai.lspi.chord.service.impl.ChordImpl;
 
 public class PatternStrategy extends Strategy {
 	private final static Logger LOG = Logger.getLogger(PatternStrategy.class);
@@ -59,25 +61,9 @@ public class PatternStrategy extends Strategy {
 	 */
 	private ID findTargetActive(){
 		LOG.info("Finding Target in active Mode");
-		
-		Map<Player, List<ID>> targets = new HashMap<Player, List<ID>>();
-		
-		for(Entry<ID, Player> p:playerMap.entrySet()){
-			KnownPlayer player = (KnownPlayer) p.getValue();
-			
-			// Add targets if a Cluster-Pattern could be detected
-			if(clusterPattern.detectPattern(player)){
-				targets.put(player, clusterPattern.findTarget(player));
-			
-			// Add targets if a Linear-Pattern could be detected
-			} else if(linearPattern.detectPattern(player)){
-				targets.put(player, linearPattern.findTarget(player));
-			
-			// No pattern detected -> Field will be choosen randomly
-			} else {
-				LOG.info("No pattern detected for Player ID="+player.getID().toHexString());
-			}
-		}
+
+		// Check for Pattern in ship-distribution of Players
+		Map<Player, List<ID>> targets = getPatternTargetMap();
 		
 		// Determined Player
 		Player targetPlayer = null;
@@ -168,12 +154,100 @@ public class PatternStrategy extends Strategy {
 		}
 	}
 	
+	/**
+	 * <strong>Find Target Passive</strong><br>
+	 * Determines a Target in passive mode considering the own Player is too weak
+	 * to receive any further hits. Therefore the designated Target should not
+	 * be aware of this player
+	 * @return Target ID
+	 */
 	private ID findTargetPassive(){
 		LOG.info("Finding Target in passive Mode");
 		
-		//TODO
+		ID target = null;
 		
-		return null;
+		// Check for Pattern in ship-distribution of Players
+		Map<Player, List<ID>> targets = getPatternTargetMap();
+		
+		// Determined Player
+		Player targetPlayer = null;
+		
+		// Get Successor from Chord
+		try {
+			ChordImpl chord = (ChordImpl) Game.instance.getChord();
+			ID successor = chord.getLocalNode().findSuccessor(Game.instance.self.getID().add(1)).getNodeID();
+			targetPlayer = playerMap.get(successor);
+			
+		} catch (CommunicationException e) {
+			LOG.error("ERROR: CommunicationException: "+e.getLocalizedMessage(), e);
+		}
+		
+		// If Successor could not be found, set any Player who has not shot at own player yet as target
+		if(targetPlayer == null){
+			
+			// Array of all HistoryEntries witch where shot at own Player
+			Stream<HistoryEntry> opt = history.getEntries().stream().filter((entry) -> entry.dstPlayer.equals(Game.instance.self.getID()));
+			HistoryEntry[] entryArr = (HistoryEntry[]) opt.toArray();
+			
+			// Collection of all possible targets
+			Collection<Player> possibleTargets = playerMap.values();
+			
+			// Check if those possible targets took a shot at own Player
+			for(int i=0; i<entryArr.length; i++){
+				Player p = Game.instance.getPlayer(history.getAttacker(entryArr[i].transactionID));
+				
+				// Remove entry from Collection of possible Targets
+				if(possibleTargets.contains(p)){
+					possibleTargets.remove(p);
+				}
+			}
+			
+			if(possibleTargets.size()>0){
+				targetPlayer = possibleTargets.iterator().next();
+			} else {
+				LOG.warn("Fallback to random Player selection due to no previously found target Player (passive Mode)");
+				targetPlayer = playerMap.entrySet().iterator().next().getValue();
+			}
+		}
+		
+		// Check if a pattern could be found for the targetPlayer
+		if(targets.containsKey(targetPlayer) && targets.get(targetPlayer).size()>0 ){
+			target = targets.get(targetPlayer).get(0);
+		} else target = getRandomTargetForPlayer(targetPlayer);
+		
+		return target;
+	}
+	
+	/**
+	 * <strong>Get Pattern TargetMap</strong><br>
+	 * Checking for Patterns in Ship-Distribution of Players
+	 * and returns Mapping of possible Targets for Players
+	 * @return Map of targetIDs for each Player
+	 */
+	private Map<Player, List<ID>> getPatternTargetMap(){
+		LOG.info("Checking Players for Ship distribution Patterns");
+		
+		Map<Player, List<ID>> targets = new HashMap<Player, List<ID>>();
+		
+		for(Entry<ID, Player> p:playerMap.entrySet()){
+			KnownPlayer player = (KnownPlayer) p.getValue();
+			
+			// Add targets if a Cluster-Pattern could be detected
+			if(clusterPattern.detectPattern(player)){
+				targets.put(player, clusterPattern.findTarget(player));
+			
+			// Add targets if a Linear-Pattern could be detected
+			} else if(linearPattern.detectPattern(player)){
+				targets.put(player, linearPattern.findTarget(player));
+			
+			// No pattern detected -> Field will be choosen randomly
+			} else {
+				LOG.info("No pattern detected for Player ID="+player.getID().toHexString());
+			}
+		}
+		
+		// Return mapping of Targets
+		return targets;
 	}
 	
 	
