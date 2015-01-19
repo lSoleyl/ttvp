@@ -167,7 +167,7 @@ public class History {
   /** Make the history read only and enter the winner and loser
    */
   public void finalize(int transactionID, ID source, ID target, Boolean hit) {
-    addEntry(transactionID, target, target, true);
+    addEntry(transactionID, source, target, true);
     gameOver = true;
     
     loserNode = source;

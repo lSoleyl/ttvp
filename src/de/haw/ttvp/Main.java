@@ -96,8 +96,8 @@ public class Main {
 		if (cliParser.hasOption("rport"))
 			rport = Integer.parseInt(cliParser.getOptionValue("rport"));
 
-		LOG.debug("local port set to: " + lport);
-		LOG.debug("remote port set to: " + rport);
+		LOG.info("local port set to: " + lport);
+		LOG.info("remote port set to: " + rport);
 
 		// Parse Bootstrap-Address
 		if (cliParser.hasOption("ip")) {

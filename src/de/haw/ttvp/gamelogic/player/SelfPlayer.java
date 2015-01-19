@@ -16,6 +16,7 @@ public class SelfPlayer extends KnownPlayer {
   
   public SelfPlayer(ID id, IDInterval range) {
     super(id, range);
+    interval.ids.forEach((i) -> fieldMap.put(i, NOTHING)); //Self wird leer initialisiert
   }
   
   @Override
@@ -29,5 +30,11 @@ public class SelfPlayer extends KnownPlayer {
   @Override
   public int shipsLost() {
     return shipsLost;
+  }
+  
+  @Override
+  public String summary(boolean verbose) {
+    return "-Self Player- (Following Ship-List contains the ships, which are left)\n" + 
+      super.summary(verbose);
   }
 }

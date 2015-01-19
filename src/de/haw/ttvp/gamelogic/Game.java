@@ -279,9 +279,11 @@ public class Game {
     
     log.info("---- Player Information ----");
     
+    log.info("\n" + self.summary(false));
     
+    playerMap.values().stream().forEach((p) -> log.info("\n" + p.summary(false)));
     
-    
+    log.info("--- Done --- ");
     log.debug("Sleeping for " + DELAY_BEFORE_SUSPEND + "ms before exiting application");
     try {
       Thread.sleep(DELAY_BEFORE_SUSPEND);

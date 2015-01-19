@@ -9,9 +9,12 @@ import de.haw.ttvp.gamelogic.Field;
 import static de.haw.ttvp.gamelogic.Field.*;
 import de.haw.ttvp.gamelogic.IDInterval;
 import de.uniba.wiai.lspi.chord.data.ID;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class KnownPlayer extends Player {
-  private final IDInterval interval;
+  protected final IDInterval interval;
   
   public KnownPlayer(ID nodeID, IDInterval interval) {
     super(nodeID);
@@ -28,10 +31,7 @@ public class KnownPlayer extends Player {
   
   @Override
   public boolean hasShipAt(ID target) {
-    ID mapID = interval.getIntervalID(target);
-    if (mapID != null)
-      return fieldMap.get(mapID) == SHIP;
-    return false;
+    return getField(target) == SHIP;
   }
 
   @Override
@@ -81,5 +81,21 @@ public class KnownPlayer extends Player {
   @Override
   public boolean isInitialPlayer() {
     return interval.getIntervalID(ID.MAX_ID) != null;
+  }
+  
+  @Override
+  public String summary(boolean verbose) {
+    List<Integer> knownShips = new ArrayList<>();
+    
+    for (int c = 0; c < interval.ids.size(); ++c)
+      if (hasShipAt(interval.ids.get(c)))
+        knownShips.add(c);
+    
+    
+    return "-Known Player-\n" + 
+      "ID-Range from: " + interval.from + "\n" + 
+      "ID-Range to  : " + interval.to + "\n" +
+      "known ships  : " + knownShips + "\n" + 
+      super.summary(verbose);
   }
 }

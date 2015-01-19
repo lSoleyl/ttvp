@@ -41,7 +41,8 @@ public class CallbackHandler implements NotifyCallback {
     LOG.debug("NotifyCallback.broadcast(" + source + ", " + target + ", " + hit + ", " + transactionID + ")");
     //Hier nicht Game.waitReady(), da es nicht notwendig ist...
     Player dstPlayer = Game.instance.getPlayer(source);
-    dstPlayer.setField(target, hit ? Field.SHIP : Field.NOTHING);
+    if (dstPlayer != Game.instance.self)
+      dstPlayer.setField(target, hit ? Field.SHIP : Field.NOTHING);
     
     if (dstPlayer.shipsLost() == Game.SHIPS) 
       Game.instance.history.finalize(transactionID, source, target, hit);

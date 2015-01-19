@@ -67,18 +67,7 @@ public class UnknownPlayer extends Player {
   
   @Override
   public String summary(boolean verbose) {
-    History history = Game.instance.history;
-    int hitCount = history.getHitCount(this);
-    int destructionCount = history.getDestructionCount(this);
-    
     return "-Unknown Player-\n" + 
-      super.summary(verbose) + "\n" + 
-      "[DEFENSE]\n" +
-      "ships lost      : " + shipsLost() + "\n" + 
-      "was shot at     : " + hitCount + " times\n" + 
-      "ships/hits      : " + ((double)shipsLost() / hitCount) + "\n" +
-      "[OFFENSE]\n" +
-      "ships destroyed : " + destructionCount;
-      //TODO print other info (shots total, shot/hit ratio)
+      super.summary(verbose); 
   }
 }

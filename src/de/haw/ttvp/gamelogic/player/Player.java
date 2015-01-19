@@ -90,6 +90,10 @@ public abstract class Player {
     return shotCount() / ((double) destructionCount());
   }
   
+  public double destructsShotsRatio() {
+    return destructionCount() / ((double) shotCount());
+  }
+  
   /** Set type of a field. If the given ID doesn't belong to this player
    *  nothing happens.
    * 
@@ -139,7 +143,20 @@ public abstract class Player {
    * @return a string representation of the player
    */
   public String summary(boolean verbose) {
-    return "Node at: " + nodeID;
+    int shipsLost = shipsLost();
+    int destructionCount = destructionCount();
+    
+    return "Node at: " + nodeID + "\n" + 
+      "[DEFENSE]\n" +
+      "ships lost      : " + shipsLost + "\n" + 
+      "was shot at     : " + hitCount() + " times\n" + 
+      "ships/hits      : " + shipsHitsRatio() + "\n" +
+      "[OFFENSE]\n" +
+      "ships destroyed : " + destructionCount + "\n" + 
+      "shots fired     : " + shotCount() + "\n" +
+      "destroyed/shots : " + destructsShotsRatio() + "\n" +
+      "[TOTAL]\n" + 
+      "destroyed/lost ratio: " + ((double)destructionCount) / shipsLost + "\n";
   }
   
   public boolean isInitialPlayer() {
