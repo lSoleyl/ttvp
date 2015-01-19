@@ -254,9 +254,6 @@ public class Game {
   public void suspend(boolean losingPlayer){
 	  log.info("Suspending TargetSelection from Game. losingPlayer="+losingPlayer);
 	  targetSelection.suspend();
-	  
-	  //TODO Workaround um Thread to beenden
-	  shoot();
   }
   
   /**

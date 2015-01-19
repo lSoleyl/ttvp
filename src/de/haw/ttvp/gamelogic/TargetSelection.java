@@ -70,5 +70,6 @@ public class TargetSelection {
    */
   public void suspend(){
 	  this.isRunning = false;
+    makeTurn.release();
   }
 }
