@@ -61,7 +61,7 @@ public abstract class Strategy {
   /** Small helper method to determine whether a player is weaker than another player.
    *  weaker = lost more ships AND has less unknown slots left
    */
-  private boolean isWeaker(KnownPlayer p1, KnownPlayer p2) {
+  protected boolean isWeaker(KnownPlayer p1, KnownPlayer p2) {
     return p1.shipsLost() >= p2.shipsLost() &&
            p1.unknownSlots() < p2.unknownSlots();
   }
