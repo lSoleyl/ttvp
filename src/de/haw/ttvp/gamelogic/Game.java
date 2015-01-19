@@ -180,12 +180,7 @@ public class Game {
   
   private Player createSelfPlayer(IDInterval idrange) {
     ChordImpl cImpl = (ChordImpl) chord;
-    Player player = new KnownPlayer(cImpl.getLocalNode().getNodeID(), idrange);
-    
-    for(ID id: idrange.ids) //Leeres Feld initialisieren
-      player.setField(id, Field.NOTHING);
-    
-    return player;
+    return new SelfPlayer(cImpl.getLocalNode().getNodeID(), idrange);
   }
   
   private List<Integer> selectShipPositions() {
@@ -255,22 +250,6 @@ public class Game {
 	  log.info("Suspending TargetSelection from Game. losingPlayer="+losingPlayer);
 	  targetSelection.suspend();
   }
-  
-  /**
-   * Increment lost Ships of this Player
-   */
-  public void addLostShip(){
-	 this.lostShips.getAndAdd(1);
-  }
-  
-  /**
-   * Get Count of lost Ships of this Player
-   * @return
-   */
-  public int getLostShips(){
-	  return this.lostShips.get();
-  }
-  
   
   /**
    * Evaluate the Result of the Game

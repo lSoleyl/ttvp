@@ -25,25 +25,13 @@ public class CallbackHandler implements NotifyCallback {
     Player self = Game.instance.self;
     
     final boolean hit = self.hasShipAt(target);
-    if (hit) {
+    if (hit)
       self.setField(target, Field.NOTHING); //Shiff als versenkt markieren
-      
-      // lostShips Counter inkrementieren
-      Game.instance.addLostShip();
-    }
     
     AsyncInvoke.invoke(() -> Game.instance.getChord().broadcast(target, hit));
     
-    if(hit && Game.instance.getLostShips() == Game.SHIPS){
-      LOG.debug("Detected destruction of own last Ship");
-    	
-      // Stop Game & trigger Evaluation of Game-Statistics
-      Game.instance.suspend(true);
-    } else {
-    	Game.instance.shoot(); //Shoot kehrt sofort zurück und führt die Zielsuche 
-        //und den Schuss von einem zweiten Thread durch. (Main-Thread)
-    }
-    
+    Game.instance.shoot(); //Shoot kehrt sofort zurück und führt die Zielsuche 
+        //und den Schuss von einem zweiten Thread durch. (Main-Thread)    
   }
 
   @Override
@@ -53,15 +41,9 @@ public class CallbackHandler implements NotifyCallback {
     Player dstPlayer = Game.instance.getPlayer(source);
     dstPlayer.setField(target, hit ? Field.SHIP : Field.NOTHING);
     
-    //TODO wenn gewonnen, dann TargetSelection-Thread benachrichtigen und History ausgeben
-    
     Game.instance.history.addEntry(transactionID, source, target, hit);
     
-    
-    //TODO hier fehlt noch der test, ob man selbst den letzten Schuss abgegeben hat.
-    //TODO außerdem ist System.exit() falsch, denn der Broadcast sollte zuende laufen können
-    //TODO stattdessen müssen alle lokalen Threads über das Spielende benachrichtigt werden
-    if (dstPlayer != Game.instance.self && dstPlayer.shipsLost() == Game.SHIPS) {
+    if (dstPlayer.shipsLost() == Game.SHIPS) {
     	LOG.debug("Detected destruction of last Ship of Player with ID: "+dstPlayer.getID().toHexString());
     	
     	// Stop Game & trigger Evaluation of Game-Statistics
