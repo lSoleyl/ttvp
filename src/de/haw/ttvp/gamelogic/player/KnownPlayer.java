@@ -5,14 +5,16 @@
  */
 package de.haw.ttvp.gamelogic.player;
 
+import static de.haw.ttvp.gamelogic.Field.SHIP;
+import static de.haw.ttvp.gamelogic.Field.UNKNOWN;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import de.haw.ttvp.gamelogic.Field;
-import static de.haw.ttvp.gamelogic.Field.*;
 import de.haw.ttvp.gamelogic.Game;
 import de.haw.ttvp.gamelogic.IDInterval;
 import de.uniba.wiai.lspi.chord.data.ID;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
 
 public class KnownPlayer extends Player {
   protected final IDInterval interval;
