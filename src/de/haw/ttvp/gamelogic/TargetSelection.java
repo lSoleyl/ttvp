@@ -1,10 +1,13 @@
 package de.haw.ttvp.gamelogic;
 
+import de.haw.ttvp.gamelogic.strategy.PatternStrategy;
 import de.haw.ttvp.gamelogic.strategy.WeakestKnownTarget;
 import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.service.Chord;
 import de.uniba.wiai.lspi.chord.service.ServiceException;
+
 import java.util.concurrent.Semaphore;
+
 import org.apache.log4j.Logger;
 
 public class TargetSelection {
@@ -59,8 +62,12 @@ public class TargetSelection {
    * @return
    */
   private ID findTarget(){
-	  //TODO
-	  return WeakestKnownTarget.instance().findTarget();
+	  // Choose Game-Strategy to determine Target
+	  if(Game.USE_SIMPLE_STRATEGY){
+		  return WeakestKnownTarget.instance(Game.instance.playerMap, Game.instance.history, Game.instance.self).findTarget();
+	  } else {
+		  return PatternStrategy.instance(Game.instance.playerMap, Game.instance.history, Game.instance.self).findTarget();
+	  }
   }
   
   /**

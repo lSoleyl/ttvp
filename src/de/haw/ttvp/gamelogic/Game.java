@@ -30,6 +30,7 @@ public class Game {
   public static final boolean USE_SIMPLE_BROADCAST = false; //Nur über den Successor broadcasten
   public static final boolean USE_ASYNC_CHORD_CALLS = false; //Wenn true, dann wird jedes retrive() broadcast() in einem Thread gestartet
   public static final int DELAY_BEFORE_SUSPEND = 1000; //ms
+  public static final boolean USE_SIMPLE_STRATEGY = false; //Fallback für einfache Strategie
   
   private static final Logger log = Logger.getLogger(Game.class);
   private boolean ready = false;
