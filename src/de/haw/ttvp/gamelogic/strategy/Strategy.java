@@ -1,12 +1,14 @@
 package de.haw.ttvp.gamelogic.strategy;
 
-import de.haw.ttvp.gamelogic.Game;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+
 import de.haw.ttvp.gamelogic.History;
 import de.haw.ttvp.gamelogic.player.KnownPlayer;
 import de.haw.ttvp.gamelogic.player.Player;
+import de.haw.ttvp.gamelogic.player.SelfPlayer;
 import de.uniba.wiai.lspi.chord.data.ID;
-import java.util.Map;
-import org.apache.log4j.Logger;
 
 /**
  * <strong>Strategy</strong><br>
@@ -19,10 +21,12 @@ public abstract class Strategy {
   
 	protected Map<ID,Player> playerMap;
 	protected History history;
+	protected SelfPlayer self;
 	
-	public Strategy(){
-		this.playerMap = Game.instance.playerMap;
-		this.history = Game.instance.history;
+	public Strategy(Map<ID, Player> playerMap, History history, SelfPlayer self){
+		this.playerMap = playerMap;
+		this.history = history;
+		this.self = self;
 	}
 	
 	/**
@@ -41,7 +45,7 @@ public abstract class Strategy {
     KnownPlayer weakestPlayer = null;
     
     for (Player player : playerMap.values()) {
-      if (player.isKnown() &&  player != Game.instance.self) { //Unbekannte Spieler ignorieren
+      if (player.isKnown() &&  player != self) { //Unbekannte Spieler ignorieren
         if (weakestPlayer == null) { //Noch kein Spieler vorhanden zum Vergleich
           weakestPlayer = player.known();
           continue;

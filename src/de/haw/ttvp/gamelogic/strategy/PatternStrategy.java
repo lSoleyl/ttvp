@@ -13,9 +13,11 @@ import org.apache.log4j.Logger;
 
 import de.haw.ttvp.gamelogic.Field;
 import de.haw.ttvp.gamelogic.Game;
+import de.haw.ttvp.gamelogic.History;
 import de.haw.ttvp.gamelogic.History.HistoryEntry;
 import de.haw.ttvp.gamelogic.player.KnownPlayer;
 import de.haw.ttvp.gamelogic.player.Player;
+import de.haw.ttvp.gamelogic.player.SelfPlayer;
 import de.uniba.wiai.lspi.chord.com.CommunicationException;
 import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.service.impl.ChordImpl;
@@ -28,9 +30,13 @@ public class PatternStrategy extends Strategy {
 	private DistributionPattern clusterPattern;
 	private DistributionPattern linearPattern;
 	
-	public static Strategy instance() {
+	private PatternStrategy(Map<ID, Player> playerMap, History history, SelfPlayer self) {
+		super(playerMap, history, self);
+	}
+	
+	public static Strategy instance(Map<ID, Player> playerMap, History history, SelfPlayer self) {
 	    if (instance == null){
-	      instance = new PatternStrategy();
+	      instance = new PatternStrategy(playerMap, history, self);
 	      
 	      instance.clusterPattern = ClusterDistributionPattern.getInstance();
 	      instance.linearPattern = LinearDistributionPattern.getInstance();
