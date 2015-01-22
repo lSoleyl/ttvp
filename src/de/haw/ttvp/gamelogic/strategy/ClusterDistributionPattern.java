@@ -41,7 +41,7 @@ public class ClusterDistributionPattern extends DistributionPattern {
 
 	@Override
 	public boolean detectPattern(KnownPlayer player) {
-		LOG.info("Detecting possible Cluster-Pattern for Player: "+player.getID().toBinaryString());
+		LOG.info("Detecting possible Cluster-Pattern for Player: "+player.getID().toHexString());
 		
 		boolean success = false;
 		
