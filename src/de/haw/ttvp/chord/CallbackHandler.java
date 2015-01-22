@@ -13,8 +13,6 @@ public class CallbackHandler implements NotifyCallback {
   
   public CallbackHandler() {}
   
-  //TODO verbinden mit dem Spiel.  (Mit 'Game.instance' auf das Game zugreifen?)
-  
   @Override
   public void retrieved(ID target) {
     LOG.debug("NotifyCallback.retrieved(" + target.toString() + ")");

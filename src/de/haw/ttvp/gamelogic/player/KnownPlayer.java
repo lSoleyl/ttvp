@@ -7,6 +7,7 @@ package de.haw.ttvp.gamelogic.player;
 
 import de.haw.ttvp.gamelogic.Field;
 import static de.haw.ttvp.gamelogic.Field.*;
+import de.haw.ttvp.gamelogic.Game;
 import de.haw.ttvp.gamelogic.IDInterval;
 import de.uniba.wiai.lspi.chord.data.ID;
 import java.util.ArrayList;
@@ -91,11 +92,19 @@ public class KnownPlayer extends Player {
       if (hasShipAt(interval.ids.get(c)))
         knownShips.add(c);
     
+    String cheater = "";
+    int shipsLeft = Game.SHIPS - knownShips.size();
+    int slotsLeft = unknownSlots();
+    if (shipsLeft > slotsLeft && this != Game.instance.self) {
+      cheater = "### This player isn't playing fair! ###\n" +
+                "    he has " + shipsLeft + " ships left and only " + slotsLeft + " slots haven't been hit so far!\n";
+      
+    }
     
     return "-Known Player-\n" + 
       "ID-Range from: " + interval.from + "\n" + 
       "ID-Range to  : " + interval.to + "\n" +
-      "known ships  : " + knownShips + "\n" + 
+      "known ships  : " + knownShips + "\n" + cheater +
       super.summary(verbose);
   }
 }

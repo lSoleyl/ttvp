@@ -27,6 +27,7 @@
  ***************************************************************************/
 package de.uniba.wiai.lspi.chord.com.socket;
 
+import de.haw.ttvp.gamelogic.Game;
 import static de.uniba.wiai.lspi.util.logging.Logger.LogLevel.DEBUG;
 
 import java.io.IOException;
@@ -1034,6 +1035,7 @@ public final class SocketProxy extends Proxy implements Runnable {
 	 * {@link de.uniba.wiai.lspi.chord.com.socket.Request} to the {@link Node},
 	 * that this is the proxy for.
 	 */
+  @Override
 	public void run() {
 		while (!this.disconnected) {
 			try {
@@ -1049,7 +1051,9 @@ public final class SocketProxy extends Proxy implements Runnable {
 										+ " here! ", cnfe);
 			} catch (IOException e) {
 				if (!this.disconnected) {
-					logger.warn("Could not read response from stream!", e);
+          logger.warn("Client left chord ring (Socketproxy: " + this + ")");
+					logger.debug("Could not read response from stream!", e);
+          Game.instance.suspend();
 				} else {
 					logger.debug(this + ": Connection has been closed!");
 				}

@@ -95,13 +95,14 @@ public class Game {
       IDInterval idRange = getNodeRange();
       self = createSelfPlayer(idRange);
       
+      distributeShips(idRange);      
+      setReady();
+      printRange(idRange);      
+      
       //Crawler erst starten, nachdem der Spieler mit dem ID-Intervall erstellt wurde.
       if (USE_NODE_CRAWLER)
         new NodeCrawler(chord).start();
       
-      distributeShips(idRange);      
-      setReady();
-      printRange(idRange);      
       
       if (self.isInitialPlayer()) {
         log.info("I am starting the Game in 3 seconds...");
@@ -272,6 +273,9 @@ public class Game {
 	  
 	  this.history.print();
     
+    if (history.getLoser() == null || history.getWinner() == null)
+      log.warn("!!!Game isn't over, yet someone quit the game!!!");
+    
     if (self.shipsLost() == SHIPS) // Wir haben verloren
       log.info("We lost the game! All our ships have been destroyed");
     else
@@ -282,7 +286,9 @@ public class Game {
     
     log.info("\n" + self.summary(false));
     
-    playerMap.values().stream().forEach((p) -> log.info("\n" + p.summary(false)));
+    //Nach zerstörten Schiffen sortieren und Zusammenfassung ausgeben
+    playerMap.values().stream().sorted((p1,p2) -> p2.destructionCount() - p1.destructionCount()).
+                                forEach((p) -> log.info("\n" + p.summary(false)));
     
     log.info("--- Done --- ");
     log.debug("Sleeping for " + DELAY_BEFORE_SUSPEND + "ms before exiting application");

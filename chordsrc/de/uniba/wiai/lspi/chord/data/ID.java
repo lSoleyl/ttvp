@@ -190,6 +190,30 @@ public final class ID implements Comparable<ID>, Serializable {
 	 */
 	private transient String stringRepresentation = null;
 
+  public String shortString() {
+    String result = "";
+    for(int c = 0; c < 4; ++c) {
+      String block = Integer.toHexString(id[c] & 0xff).toUpperCase();
+
+			// add leading zero to block, if necessary
+			if (block.length() < 2)
+				block = "0" + block;
+      
+      result += block + " ";
+    }
+    
+    result += "... ";
+    
+    String block = Integer.toHexString(id[id.length-1] & 0xff).toUpperCase();
+
+    // add leading zero to block, if necessary
+    if (block.length() < 2)
+      block = "0" + block;
+    
+    result += block;
+    return result;
+  }
+  
 	/**
 	 * Returns a string of the decimal representation of this ID, including
 	 * leading zeros.

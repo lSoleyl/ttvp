@@ -93,7 +93,7 @@ public class History {
   public void print() {
     log.info("---------- History Content ------------");
     Player starter = Game.instance.getInitialPlayer();
-    String attacker = (starter != null) ? starter.getID().toString() : "???";
+    String attacker = (starter != null) ? starter.getID().shortString() : "???";
     int lastID = -1;
     
     for(HistoryEntry e : entries) {
@@ -102,15 +102,18 @@ public class History {
       String slot = "ID:" + e.targetID;
       if (p.isKnown())
         slot = "Slot#" + p.known().getInterval().getIntervalIndex(e.targetID);
-      
+            
       if (lastID != e.transactionID - 1)
         attacker = "???";
       
+      if (slot.equals("Slot#-1"))
+        log.warn("Target with ID: " +  e.targetID + " seems to have left the game");
+      
       log.info(String.format("%4d - %s  (%s) -> (%s)[%s]", e.transactionID, hit, 
-              attacker, e.dstPlayer, slot));
+              attacker, e.dstPlayer.shortString(), slot));
       
       lastID = e.transactionID;
-      attacker = e.dstPlayer.toString();
+      attacker = e.dstPlayer.shortString();
     }
     
   }

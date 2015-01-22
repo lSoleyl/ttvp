@@ -29,7 +29,7 @@ public class NodeCrawler extends Thread {
     ID predecessor = localNode.getNodeID();
     ID current = predecessor.add(1);    
     
-    while(!Game.instance.self.known().getInterval().contains(current)) {
+    while(!Game.instance.self.getInterval().contains(current)) {
       try {
         log.debug("calling findSuccessor(" + current + ")");
         Node remote = localNode.findSuccessor(current);
