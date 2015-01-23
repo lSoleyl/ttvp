@@ -42,6 +42,7 @@ public abstract class Strategy {
    * @return the weakest player or null if only unknown players exist
    */
   protected KnownPlayer selectWeakestKnownPlayer() {
+	log.info("Searching for weakest Player");
     KnownPlayer weakestPlayer = null;
     
     for (Player player : playerMap.values()) {
