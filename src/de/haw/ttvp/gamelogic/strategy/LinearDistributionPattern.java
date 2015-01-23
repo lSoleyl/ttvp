@@ -177,6 +177,9 @@ public class LinearDistributionPattern extends DistributionPattern {
 		}
 		
 		// smallest Distance between known ships
+    if (shipPos.isEmpty())
+      return null;
+    
 		int minDist = shipPos.get(0);
 		int lastIdx = -1;
 		
