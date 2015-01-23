@@ -1,5 +1,6 @@
 package de.haw.ttvp.gamelogic;
 
+import de.haw.ttvp.gamelogic.player.Player;
 import de.haw.ttvp.gamelogic.strategy.PatternStrategy;
 import de.haw.ttvp.gamelogic.strategy.WeakestKnownTarget;
 import de.uniba.wiai.lspi.chord.data.ID;
@@ -41,6 +42,14 @@ public class TargetSelection {
 
       //Ziel wählen und Schuss abgeben
       final ID target = findTarget();
+      for (Player p : Game.instance.playerMap.values()) {
+        if (p.isKnown() && p.known().getInterval().contains(target)) {
+          log.info("Selected player: " + p.getID().shortString() + "  he has lost " + p.shipsLost() + " ships and has " + 
+                  p.known().unknownSlots() + " UNKNOWN slots left");
+          break;
+        }
+      }
+      
       log.info("Shooting at ID: " + target);
       log.debug("calling retrive(" + target + ")");
       AsyncInvoke.invoke(() -> {
