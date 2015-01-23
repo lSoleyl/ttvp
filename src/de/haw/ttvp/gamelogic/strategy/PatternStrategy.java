@@ -1,7 +1,6 @@
 package de.haw.ttvp.gamelogic.strategy;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,11 +12,9 @@ import org.apache.log4j.Logger;
 
 import de.haw.ttvp.gamelogic.Field;
 import de.haw.ttvp.gamelogic.Game;
-import de.haw.ttvp.gamelogic.History;
 import de.haw.ttvp.gamelogic.History.HistoryEntry;
 import de.haw.ttvp.gamelogic.player.KnownPlayer;
 import de.haw.ttvp.gamelogic.player.Player;
-import de.haw.ttvp.gamelogic.player.SelfPlayer;
 import de.uniba.wiai.lspi.chord.com.CommunicationException;
 import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.service.impl.ChordImpl;
@@ -30,13 +27,13 @@ public class PatternStrategy extends Strategy {
 	private DistributionPattern clusterPattern;
 	private DistributionPattern linearPattern;
 	
-	private PatternStrategy(Map<ID, Player> playerMap, History history, SelfPlayer self) {
-		super(playerMap, history, self);
+	private PatternStrategy() {
+		super();
 	}
 	
-	public static Strategy instance(Map<ID, Player> playerMap, History history, SelfPlayer self) {
+	public static PatternStrategy instance() {
 	    if (instance == null){
-	      instance = new PatternStrategy(playerMap, history, self);
+	      instance = new PatternStrategy();
 	      
 	      instance.clusterPattern = ClusterDistributionPattern.getInstance();
 	      instance.linearPattern = LinearDistributionPattern.getInstance();
@@ -50,7 +47,7 @@ public class PatternStrategy extends Strategy {
 		LOG.info("Finding an appropriate Target");
 		
 		// Passive Mode if own Player is weakest Player in the Game
-		if(isWeaker(Game.instance.self, selectWeakestKnownPlayer()) ){
+		if(isWeaker(self, selectWeakestKnownPlayer()) ){
 			return findTargetPassive();
 		// Active Mode if own Player is not weakest Player in the Game
 		} else {
@@ -84,6 +81,7 @@ public class PatternStrategy extends Strategy {
 		
 		// No dying Player could be detected therefore another target has to be determined
 		if(targetPlayer == null){
+			LOG.info("Determining backshooting Player");
 		
 			// Try to find Player who shoots back at origin
 			List<Player> backShootingPlayers = new ArrayList<>();
@@ -91,17 +89,22 @@ public class PatternStrategy extends Strategy {
 			for(Entry<ID, Player> playerEntry:playerMap.entrySet()){
 				
 				// Iterate through History
+				boolean hasEntries = false;
 				boolean shootsBack = true;
 				ID lastAttacker = null;
 				for(HistoryEntry entry:history.getEntries()){
-					if(history.getAttacker(entry.transactionID).equals(playerEntry.getKey())
-							&& !entry.dstPlayer.equals(lastAttacker)){
-						shootsBack = false;
+					// Check if entry describes shot by designated Player
+					if(history.getAttacker(entry.transactionID).equals(playerEntry.getKey())){
+						// Check if Player was shooting back at previous Attacker
+						if(!entry.dstPlayer.equals(lastAttacker)){
+							shootsBack = false;
+						}
+						hasEntries = true;
 					}
 					lastAttacker = history.getAttacker(entry.transactionID);
 				}
 				
-				if(shootsBack){
+				if(hasEntries && shootsBack){
 					backShootingPlayers.add(playerEntry.getValue());
 				}
 			}
@@ -112,21 +115,22 @@ public class PatternStrategy extends Strategy {
 			for(Player player:backShootingPlayers){
 				
 				// Check if player is weaker and therefore likely to be killed
-				if(weakestBackshooter == null || isWeaker((KnownPlayer) targetPlayer, (KnownPlayer) player)){
+				if(weakestBackshooter == null || isWeaker(self, (KnownPlayer) player)){
 					weakestBackshooter = player;
 				}
 			}
 			
 			// Setting Backshooting Player as new Target
-			if(!isWeaker((KnownPlayer) targetPlayer, Game.instance.self)){
+			if(weakestBackshooter != null && !isWeaker((KnownPlayer) weakestBackshooter, self)){
 				targetPlayer = weakestBackshooter;
 				LOG.info("Targeting backshooting Player: ID="+targetPlayer.getID().toHexString());
-			}
+			} else LOG.info("No backshooting Player could be detected or own Player is too weak");
 			
 		}
 		
 		// No backshooting Player detected or weakest backshooting Player stronger than own Player
 		if(targetPlayer == null){
+			LOG.info("Determining the most inactive Player");
 			
 			// Find inactive Player
 			Player mostInactivePlayer = null;
@@ -181,30 +185,43 @@ public class PatternStrategy extends Strategy {
 		// Get Successor from Chord
 		try {
 			ChordImpl chord = (ChordImpl) Game.instance.getChord();
-			ID successor = chord.getLocalNode().findSuccessor(Game.instance.self.getID().add(1)).getNodeID();
+			ID successor = chord.getLocalNode().findSuccessor(self.getID().add(1)).getNodeID();
 			targetPlayer = playerMap.get(successor);
 			
-		} catch (CommunicationException e) {
-			LOG.error("ERROR: CommunicationException: "+e.getLocalizedMessage(), e);
+		} catch (CommunicationException | NullPointerException e) {
+			LOG.error("ERROR: Could not get this Player Successor from Chord: "+e.getLocalizedMessage(), e);
 		}
 		
 		// If Successor could not be found, set any Player who has not shot at own player yet as target
 		if(targetPlayer == null){
 			
 			// Array of all HistoryEntries witch where shot at own Player
-			Stream<HistoryEntry> opt = history.getEntries().stream().filter((entry) -> entry.dstPlayer.equals(Game.instance.self.getID()));
-			HistoryEntry[] entryArr = (HistoryEntry[]) opt.toArray();
+			Stream<HistoryEntry> opt = history.getEntries().stream().filter((entry) -> entry.dstPlayer.equals(self.getID()));
+			Object[] entryArr = opt.toArray();
 			
-			// Collection of all possible targets
-			Collection<Player> possibleTargets = playerMap.values();
+			// Mapping of all possible targets
+			Map<Player, Boolean> shotAtUs = new HashMap<>();
+			
+			for(Player p:playerMap.values())
+				shotAtUs.put(p, false);
 			
 			// Check if those possible targets took a shot at own Player
 			for(int i=0; i<entryArr.length; i++){
-				Player p = Game.instance.getPlayer(history.getAttacker(entryArr[i].transactionID));
+				HistoryEntry entry = (HistoryEntry) entryArr[i];
+				Player p = Game.instance.getPlayer(Game.instance.history.getAttacker(entry.transactionID) );
 				
 				// Remove entry from Collection of possible Targets
-				if(possibleTargets.contains(p)){
-					possibleTargets.remove(p);
+				if(shotAtUs.containsKey(p)){
+					LOG.info("Found Player who shoot at us: "+p.getID().toHexString());
+					shotAtUs.put(p, true);
+				}
+			}
+			
+			// List of Targets who did not shot at us
+			List<Player> possibleTargets = new ArrayList<>();
+			for(Entry<Player, Boolean> e:shotAtUs.entrySet()){
+				if(!e.getValue()){
+					possibleTargets.add(e.getKey());
 				}
 			}
 			
