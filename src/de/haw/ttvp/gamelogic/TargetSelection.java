@@ -64,9 +64,9 @@ public class TargetSelection {
   private ID findTarget(){
 	  // Choose Game-Strategy to determine Target
 	  if(Game.USE_SIMPLE_STRATEGY){
-		  return WeakestKnownTarget.instance(Game.instance.playerMap, Game.instance.history, Game.instance.self).findTarget();
+		  return WeakestKnownTarget.instance().findTarget();
 	  } else {
-		  return PatternStrategy.instance(Game.instance.playerMap, Game.instance.history, Game.instance.self).findTarget();
+		  return PatternStrategy.instance().findTarget();
 	  }
   }
   

@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import de.haw.ttvp.gamelogic.Game;
 import de.haw.ttvp.gamelogic.History;
 import de.haw.ttvp.gamelogic.player.KnownPlayer;
 import de.haw.ttvp.gamelogic.player.Player;
@@ -23,10 +24,10 @@ public abstract class Strategy {
 	protected History history;
 	protected SelfPlayer self;
 	
-	public Strategy(Map<ID, Player> playerMap, History history, SelfPlayer self){
-		this.playerMap = playerMap;
-		this.history = history;
-		this.self = self;
+	public Strategy(){
+		this.playerMap = Game.instance.playerMap;
+		this.history = Game.instance.history;
+		this.self = Game.instance.self;
 	}
 	
 	/**

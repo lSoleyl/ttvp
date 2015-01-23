@@ -1,16 +1,12 @@
 package de.haw.ttvp.gamelogic.strategy;
 
-import de.haw.ttvp.gamelogic.Field;
-import de.haw.ttvp.gamelogic.History;
-import de.haw.ttvp.gamelogic.player.KnownPlayer;
-import de.haw.ttvp.gamelogic.player.Player;
-import de.haw.ttvp.gamelogic.player.SelfPlayer;
-import de.uniba.wiai.lspi.chord.data.ID;
-
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+
+import de.haw.ttvp.gamelogic.Field;
+import de.haw.ttvp.gamelogic.player.KnownPlayer;
+import de.uniba.wiai.lspi.chord.data.ID;
 
 /** This strategy fires on the weakest player which is a known player.
  *  weakest = has lost most ships AND has fewest unknown slots left
@@ -20,9 +16,8 @@ public class WeakestKnownTarget extends Strategy {
 	private final Logger log = Logger.getLogger(WeakestKnownTarget.class);
 	private static Strategy instance = null;
 	
-	private WeakestKnownTarget(Map<ID, Player> playerMap, History history,
-			SelfPlayer self) {
-		super(playerMap, history, self);
+	private WeakestKnownTarget() {
+		super();
 	}
   
   @Override
@@ -47,10 +42,9 @@ public class WeakestKnownTarget extends Strategy {
      return null;
   }
 
-  public static Strategy instance(Map<ID, Player> playerMap, History history,
-			SelfPlayer self) {
+  public static Strategy instance() {
     if (instance == null)
-      instance = new WeakestKnownTarget(playerMap, history, self);
+      instance = new WeakestKnownTarget();
     
     return instance;    
   }
