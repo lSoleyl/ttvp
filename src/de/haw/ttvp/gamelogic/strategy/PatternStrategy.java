@@ -18,6 +18,7 @@ import de.haw.ttvp.gamelogic.player.Player;
 import de.uniba.wiai.lspi.chord.com.CommunicationException;
 import de.uniba.wiai.lspi.chord.data.ID;
 import de.uniba.wiai.lspi.chord.service.impl.ChordImpl;
+import java.util.Random;
 
 public class PatternStrategy extends Strategy {
 	private final static Logger LOG = Logger.getLogger(PatternStrategy.class);
@@ -285,11 +286,15 @@ public class PatternStrategy extends Strategy {
 	private ID getRandomTargetForPlayer(Player player){
 		LOG.info("Get random Target for Player with ID="+player.getID().toHexString());
 		
-		for(Entry<ID, Field> entry:player.getFieldMap().entrySet()){
-			if(entry.getValue() == Field.UNKNOWN){
-				return entry.getKey();
-			}
-		}
+    List<ID> targets = new ArrayList<>();
+    
+    for (Entry<ID, Field> e: player.getFieldMap().entrySet()) {
+      if (e.getValue() == Field.UNKNOWN)
+        targets.add(e.getKey());
+    }
+    
+    if (!targets.isEmpty())
+      return targets.get(new Random().nextInt(targets.size()));
 		
 		// No Field found
 		return null;
