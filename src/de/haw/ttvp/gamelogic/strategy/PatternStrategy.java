@@ -45,7 +45,7 @@ public class PatternStrategy extends Strategy {
 
 	@Override
 	public ID findTarget() {
-		LOG.info("Finding an appropriate Target");
+		LOG.debug("Finding an appropriate Target");
 		
 		// Passive Mode if own Player is weakest Player in the Game
 		if(isWeaker(self, selectWeakestKnownPlayer()) ){
@@ -82,7 +82,7 @@ public class PatternStrategy extends Strategy {
 		
 		// No dying Player could be detected therefore another target has to be determined
 		if(targetPlayer == null){
-			LOG.info("Determining backshooting Player");
+			LOG.debug("Determining backshooting Player");
 		
 			// Try to find Player who shoots back at origin
 			List<Player> backShootingPlayers = new ArrayList<>();
@@ -127,13 +127,13 @@ public class PatternStrategy extends Strategy {
 			if(weakestBackshooter != null && !isWeaker((KnownPlayer) weakestBackshooter, self)){
 				targetPlayer = weakestBackshooter;
 				LOG.info("Targeting backshooting Player: ID="+targetPlayer.getID().toHexString());
-			} else LOG.info("No backshooting Player could be detected or own Player is too weak");
+			} else LOG.debug("No backshooting Player could be detected or own Player is too weak");
 			
 		}
 		
 		// No backshooting Player detected or weakest backshooting Player stronger than own Player
 		if(targetPlayer == null){
-			LOG.info("Determining the most inactive Player");
+			LOG.debug("Determining the most inactive Player");
 			
 			// Find inactive Player
 			Player mostInactivePlayer = null;
@@ -153,8 +153,10 @@ public class PatternStrategy extends Strategy {
 		
 		// Fallback: select random Player
 		if(targetPlayer == null){
-			LOG.warn("Fallback to random Player selection due to no previously found target Player");
+			LOG.debug("Fallback to random Player selection due to no previously found target Player");
 			targetPlayer = playerMap.entrySet().iterator().next().getValue();
+			
+			LOG.info("Targeting random Player: ID: "+targetPlayer.getID().toHexString());
 		}
 		
 		// Return one of the possible pattern targets for the designated target Player
@@ -191,6 +193,8 @@ public class PatternStrategy extends Strategy {
 			ID successor = chord.getLocalNode().findSuccessor(self.getID().add(1)).getNodeID();
 			targetPlayer = playerMap.get(successor);
 			
+			LOG.info("Targeting Successor Player: ID: "+targetPlayer.getID().toHexString());
+			
 		} catch (CommunicationException | NullPointerException e) {
 			LOG.error("ERROR: Could not get this Player Successor from Chord: "+e.getLocalizedMessage(), e);
 		}
@@ -215,7 +219,7 @@ public class PatternStrategy extends Strategy {
 				
 				// Remove entry from Collection of possible Targets
 				if(shotAtUs.containsKey(p)){
-					LOG.info("Found Player who shoot at us: "+p.getID().toHexString());
+					LOG.debug("Found Player who shoot at us: "+p.getID().toHexString());
 					shotAtUs.put(p, true);
 				}
 			}
@@ -231,9 +235,13 @@ public class PatternStrategy extends Strategy {
 			// Select target from Collection of remaining possible Targets
 			if(possibleTargets.size()>0){
 				targetPlayer = possibleTargets.iterator().next();
+				
+				LOG.info("Targeting Player who did not shoot at us: ID: "+targetPlayer.getID().toHexString());
 			} else {
-				LOG.warn("Fallback to random Player selection due to no previously found target Player (passive Mode)");
+				LOG.debug("Fallback to random Player selection due to no previously found target Player (passive Mode)");
 				targetPlayer = playerMap.entrySet().iterator().next().getValue();
+				
+				LOG.info("Targeting Random Player: ID: "+targetPlayer.getID().toHexString());
 			}
 		}
 		
@@ -252,7 +260,7 @@ public class PatternStrategy extends Strategy {
 	 * @return Map of targetIDs for each Player
 	 */
 	private Map<Player, List<ID>> getPatternTargetMap(){
-		LOG.info("Checking Players for Ship distribution Patterns");
+		LOG.debug("Checking Players for Ship distribution Patterns");
 		
 		Map<Player, List<ID>> targets = new HashMap<Player, List<ID>>();
 		
@@ -269,7 +277,7 @@ public class PatternStrategy extends Strategy {
 			
 			// No pattern detected -> Field will be choosen randomly
 			} else {
-				LOG.info("No pattern detected for Player ID="+player.getID().toHexString());
+				LOG.debug("No pattern detected for Player ID="+player.getID().toHexString());
 			}
 		}
 		
