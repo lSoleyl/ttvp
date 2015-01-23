@@ -95,14 +95,16 @@ public class PatternStrategy extends Strategy {
 				ID lastAttacker = null;
 				for(HistoryEntry entry:history.getEntries()){
 					// Check if entry describes shot by designated Player
-					if(history.getAttacker(entry.transactionID).equals(playerEntry.getKey())){
+          ID attacker = history.getAttacker(entry.transactionID);
+          
+					if(attacker != null && attacker.equals(playerEntry.getKey())){
 						// Check if Player was shooting back at previous Attacker
 						if(!entry.dstPlayer.equals(lastAttacker)){
 							shootsBack = false;
 						}
 						hasEntries = true;
 					}
-					lastAttacker = history.getAttacker(entry.transactionID);
+					lastAttacker = attacker;
 				}
 				
 				if(hasEntries && shootsBack){
